@@ -1,2 +1,2 @@
 # yangdiff-app
-Tool for finding difference between Yang Modules
+Django Web tool for finding difference between Yang Modules
