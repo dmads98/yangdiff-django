@@ -1,0 +1,14 @@
+// old: Cisco-IOS-XR-telemetry-model-driven-oper-633 (2017-05-05) Cisco-IOS-XR-telemetry-model-driven-oper-633.yang
+// new: Cisco-IOS-XR-telemetry-model-driven-oper (2017-09-27) Cisco-IOS-XR-telemetry-model-driven-oper.yang
+
+M container telemetry-model-driven
+  M container destinations
+    M list destination
+      M list destination
+        M list collection-group
+          A leaf strict-timer
+  M container subscriptions
+    M list subscription
+      M list collection-group
+        A leaf strict-timer
+  A container summary

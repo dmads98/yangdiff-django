@@ -7,6 +7,8 @@ def main():
 	new_vers = "652"
 	diff_type = "normal"
 	header = "false"
+	create_temp_directory()
+	create_output_directory()
 	copy_and_modify_files(old_file, old_vers)
 	if (check_for_valid_files(old_file + "-" + old_vers, "temp_files") and check_for_valid_files(new_file, new_vers + "-yang")):
 		subpr = subprocess.run([
@@ -33,6 +35,11 @@ def create_temp_directory():
 	subpr = subprocess.run([
 		"mkdir",
 		"temp_files"])
+
+def create_output_directory():
+	subpr = subprocess.run([
+		"mkdir",
+		"diff_output"])
 
 def check_for_valid_files(file, dir_name):
 	subpr = subprocess.run([
@@ -104,4 +111,3 @@ def modify_line(line, vers):
 
 if __name__ == "__main__":
 	main()
-
