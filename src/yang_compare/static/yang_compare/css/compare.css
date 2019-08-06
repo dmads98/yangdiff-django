@@ -1,0 +1,12 @@
+body {
+    padding: 0;
+    margin: 0;
+    font-family: "Copperplate Gothic Light", "Helvetica Neue", Helvetica, sans-serif;
+    font-size: .9rem;
+    color: blue;
+}
+
+#test{
+	font-weight: 200;
+  	color: red;
+}
