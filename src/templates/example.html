@@ -4,5 +4,10 @@
 
 <h1>YangDiff App</h1>
 
+{% load tag %}
+<div id="id_div">
+    {% hello_world ' you fucking Fool' as salute_text %}
+    <strong> {{ salute_text }} </strong>
+</div>
 
 {% endblock %}
