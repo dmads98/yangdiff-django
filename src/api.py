@@ -1,5 +1,6 @@
 import urllib.parse
 import requests
+import json
 
 def main():
 	# people = requests.get('http://api.open-notify.org/astros.json')
@@ -19,8 +20,12 @@ def main():
 	github_request()
 
 def github_request():
-	request = requests.get('https://raw.githubusercontent.com/YangModels/yang/master/vendor/cisco/xr/633/Cisco-IOS-XR-cdp-oper.yang')
-	print(request.text)
+	request = requests.get('https://api.github.com/repos/YangModels/yang/contents/vendor/cisco/xr')
+	json = request.json()
+	for el in json:
+		if (el["type"] == "dir"):
+			print(el["name"])
+	# print(json.dumps(request.json(), indent = 4))
 	print(request.status_code)
 
 if __name__ == "__main__":
