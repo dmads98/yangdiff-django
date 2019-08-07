@@ -6,11 +6,16 @@
 
 {% endblock %}
 
+{% block head_title %}
+Yang File Compare
+{% endblock %}
 
 {% block content %}
 
-<h1>Yang Compare</h1>
-<hr>
+<div class="jumbotron">
+      <h1 class="text-center display-4">Yang Compare</h1>
+      <p class="lead text-center">This is sample text</p>
+</div>
 
 <h3 id="test">Select Files to Compare:</h3>
 <hr>
@@ -18,6 +23,9 @@
 <div id="tree">
 	
 </div>
+<hr>
+<button id="myClickButton" type="button">Click</button>
+<div id="myOutput"></div>
 
 
 {% endblock %}

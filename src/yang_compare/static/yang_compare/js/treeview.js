@@ -1,16 +1,4 @@
-$(document).ready(() => {
-	$('#test').on('mouseenter', () => {
-    $('#test').css({
-      color: 'green'
-    })
-  	}).on('mouseleave', () => {
-    $('#test').css({
-      color: 'red'
-    })
-    $('#test').html('Select Files to Compare:')
-  	})
-
-  	function getTree() {
+function getTree() {
 	  // Some logic to retrieve, or generate tree structure
 	  var tree = [
 		  {
@@ -48,5 +36,36 @@ $(document).ready(() => {
 	  return tree;
 	}
 
+$(document).ready(() => {
+	$('#test').on('mouseenter', () => {
+    $('#test').css({
+      color: 'green'
+    })
+  	}).on('mouseleave', () => {
+    $('#test').css({
+      color: 'red'
+    })
+    $('#test').html('Select Files to Compare:')
+  	})
+
 	$('#tree').treeview({data: getTree()});
+
+	$("#myClickButton").on('click', () => {
+		var info = $("#myClickButton").html();
+	    $.ajax({
+	    	url: 'ajax/test',
+	    	type: 'GET',
+	    	data:{
+	    		button_info: info
+	    	},
+	    	success: function(response){
+	    		console.log(response)
+	    		$('#myOutput').html(response.info.text)
+	    	},
+	    	error : function(response){
+   				console.log(response)
+   			}
+
+	    });
+	});
 })
