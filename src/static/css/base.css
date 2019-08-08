@@ -1,0 +1,16 @@
+.footer.segment {
+	padding: 2em 0em;
+}
+
+.fixed.inverted.menu .toc.item {
+	display: none;
+}
+
+@media only screen and (max-width: 700px) {
+	.fixed.inverted.menu .item {
+		display: none;
+	}
+	.fixed.inverted.menu .toc.item {
+		display: block;
+	}
+}

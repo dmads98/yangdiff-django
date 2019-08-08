@@ -1,9 +1,9 @@
 {% extends "base.html" %}
+
 {% load static %}
 
 {% block css %}
 <link rel="stylesheet" type="text/css" href="{% static 'yang_compare/css/compare.css' %}">
-
 {% endblock %}
 
 {% block head_title %}
@@ -12,17 +12,21 @@ Yang File Compare
 
 {% block content %}
 
-<div class="jumbotron">
-      <h1 class="text-center display-4">Yang Compare</h1>
-      <p class="lead text-center">This is sample text</p>
+<div id="jumbo" class="ui vertical masthead center aligned segment">
+
+  <div class="ui text container">
+    <h1 class="ui header">
+      Yang Compare
+    </h1>
+    <h2>Sample Text.</h2>
+    <div class="ui huge secondary button">Get Started <i class="right arrow icon"></i></div>
+  </div>
+
 </div>
 
-<h3 id="test">Select Files to Compare:</h3>
-<hr>
+<div id="space-button" class="ui huge primary button">Run Shit <i class="right arrow icon"></i></div>
+  
 
-<div id="tree">
-	
-</div>
 <hr>
 <button type="button" class="btn btn-primary" id="myClickButton">Show XR Versions</button>
 <div id="versions" class="card" style="width: 18rem;">
@@ -38,6 +42,6 @@ Yang File Compare
 {% endblock %}
 
 {% block script %}
-<script src="{% static 'yang_compare/js/treeview.js' %}"></script>
+<!-- <script src="{% static 'yang_compare/js/compare.js' %}"></script> -->
 
 {% endblock %}

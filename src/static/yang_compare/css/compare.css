@@ -1,15 +1,41 @@
-body {
-    padding: 0;
-    margin: 0;
-    font-family: "Copperplate Gothic Light", "Helvetica Neue", Helvetica, sans-serif;
-    font-size: .9rem;
+#space-button {
+  margin: 20em 10em;
 }
 
-#test{
-	font-weight: 200;
-  	color: red;
+#jumbo{
+  background-color: #9ed1de;
 }
 
-#versions{
-	padding: 10px;
+.masthead.segment {
+  min-height: 400px;
+  padding: 1em 0em;
+}
+
+.masthead h1.ui.header {
+  margin-top: 1.5em;
+  margin-bottom: 0em;
+  font-size: 4em;
+  font-weight: normal;
+}
+.masthead h2 {
+  font-size: 1.7em;
+  font-weight: normal;
+  margin-bottom: 1em;
+}
+
+@media only screen and (max-width: 700px) {
+  .masthead.segment {
+    min-height: 300px;
+  }
+  .masthead .ui.button {
+    font-size: 1rem;
+  }
+  .masthead h1.ui.header {
+    font-size: 2em;
+    margin-top: 2.5em;
+  }
+  .masthead h2 {
+    margin-top: 0.5em;
+    font-size: 1.5em;
+  }
 }

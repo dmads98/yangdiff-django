@@ -22,8 +22,6 @@ def changeOutput(request):
 
 def getVersions(request):
 	if request.method == "GET" and request.is_ajax():
-		text = request.GET.get("button_info")
-		print(text)
 		vers_req = requests.get('https://api.github.com/repos/YangModels/yang/contents/vendor/cisco/xr')
 		json = vers_req.json()
 		versions = []
