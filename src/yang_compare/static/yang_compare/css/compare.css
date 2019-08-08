@@ -9,6 +9,12 @@
 #versions{
   margin: 1em 1em;
   max-width: 300px;
+  display: none;
+}
+
+#search-dropdown{
+  margin: 10em 7em;
+  max-width: 400px;
 }
 
 #jumbo{

@@ -30,29 +30,11 @@ Yang File Compare
 <h1 id="select-title">Select Files to Compare:</h1>
 <hr>
 
-<div id="placeholder" class="ui placeholder">
-  <div class="image header">
-    <div class="line"></div>
-    <div class="line"></div>
-  </div>
-  <div class="paragraph">
-    <div class="line"></div>
-    <div class="line"></div>
-    <div class="line"></div>
-    <div class="line"></div>
-    <div class="line"></div>
-  </div>
-  <div class="image header">
-    <div class="line"></div>
-    <div class="line"></div>
-  </div>
-  <div class="paragraph">
-    <div class="line"></div>
-    <div class="line"></div>
-    <div class="line"></div>
-    <div class="line"></div>
-    <div class="line"></div>
-  </div>
+
+<div id="search-dropdown" class="ui fluid search selection dropdown">
+  <input type="hidden" name="version">
+  <i class="dropdown icon"></i>
+  <div class="default text">Select XR Version</div>
 </div>
 
 <hr>
@@ -68,14 +50,6 @@ Yang File Compare
 		</div>
 	</div>
 </div>
-<!-- <div id="versions" class="card" style="width: 18rem;">
-  <div class="card-header">
-    Versions
-  </div>
-  <ul id="versions-list" class="list-group list-group-flush">
-    
-  </ul>
-</div> -->
 
 
 {% endblock %}

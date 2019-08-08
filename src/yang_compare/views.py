@@ -2,8 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 import requests
 import json
+from django.conf import settings
 
 # Create your views here.
+
+MY_TOKEN = settings.MY_TOKEN
 
 def compare_page(request):
 	context = {"title": "Yang Compare"}
@@ -12,15 +15,23 @@ def compare_page(request):
 	#rendered_item = template_obj.render(context)
 	return render(request, template_name, context)
 
-def changeOutput(request):
+def getDropDownVersions(request):
 	if request.method == "GET" and request.is_ajax():
-		text = request.GET.get("button_info")
-		print(text)
-		info = {"text": "test"}
-		return JsonResponse({"info": info}, status=200)
-	return JsonResponse({"success":False}, status=400)
+		results = []
+		vers_req = requests.get('https://api.github.com/repos/YangModels/yang/contents/vendor/cisco/xr')
+		json = vers_req.json()
+		for el in json:
+			if (el["type"] == "dir"):
+				results.append({
+					"name": el["name"],
+					"value": el["name"],
+					"text": el["name"]
+					})
+		return JsonResponse({"success": True, "results": results}, status=200)
+	return JsonResponse({"success": False}, status=400)
 
 def getVersions(request):
+	req = requests.get("https://api.github.com/rate_limit", auth=('dmads98', MY_TOKEN))
 	if request.method == "GET" and request.is_ajax():
 		vers_req = requests.get('https://api.github.com/repos/YangModels/yang/contents/vendor/cisco/xr')
 		json = vers_req.json()
@@ -28,5 +39,8 @@ def getVersions(request):
 		for el in json:
 			if (el["type"] == "dir"):
 				versions.append((el["name"]))
-		return JsonResponse({"versions" :versions}, status=200)
-	return JsonResponse({"success":False}, status=400)
+		return JsonResponse({"success": True, "versions" :versions}, status=200)
+	return JsonResponse({"success": False}, status=400)
+
+
+

@@ -29,4 +29,15 @@ $(document).ready(() => {
 			$('#versions-button').html("Show XR Versions")
 		}
 	});
+	$('#start-btn').on('click', (e) => { 
+		$('html, body').animate({
+      		scrollTop: $($(e.currentTarget).attr('href')).outerHeight() - 
+      		$('.ui.menu .header.item').height() - 
+      		$('.ui.menu .header.item').outerHeight()
+    	},
+    	500,
+    	'linear'
+  		)
+	});
+	
 })

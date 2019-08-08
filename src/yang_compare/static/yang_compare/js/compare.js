@@ -17,10 +17,9 @@ var getVersions = function(){
 };
 
 $(document).ready(() => {
-  	$(".versions").hide()
 	getVersions()
 	$("#versions-button").on('click', () => {
-		$(".versions").toggle()
+		$("#versions").toggle()
 		var content = $('#versions-button').html()
 		if (content == "Show XR Versions"){
 			$('#versions-button').html("Hide XR Versions")
@@ -38,6 +37,17 @@ $(document).ready(() => {
     	500,
     	'linear'
   		)
+	});
+	$('#search-dropdown').dropdown({
+		forceSelection: false,
+		clearable: true,
+      	filterRemoteData: true,
+      	saveRemoteData: false,
+		apiSettings: {
+      		// this url parses query server side and returns filtered results
+      		url: '/compare/ajax/test',
+      		cache: false
+    	},
 	});
 	
 })

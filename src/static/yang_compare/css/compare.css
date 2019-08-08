@@ -11,8 +11,16 @@
   max-width: 300px;
 }
 
+#search-drop{
+  margin: 10em 5em;
+}
+
 #jumbo{
   background-color: #9ed1de;
+}
+
+#select-title{
+  margin: 0.5em 1em;
 }
 
 .masthead.segment {
