@@ -6,7 +6,7 @@ var getVersions = function(){
     		console.log(response);
     		let list = '';
         	response.versions.forEach(vers => {
-        		list += `<li class="list-group-item">${vers}</li>`;
+        		list += `<div class="item">${vers}</div>`;
 			});
     		$('#versions-list').append(list);
     	},
@@ -17,19 +17,10 @@ var getVersions = function(){
 };
 
 $(document).ready(() => {
-	$('#test').on('mouseenter', () => {
-	    $('#test').css({
-	      color: 'green'
-	    })
-  	}).on('mouseleave', () => {
-	    $('#test').css({
-	      color: 'red'
-	    })
-  	})
-  	$("#versions").hide()
+  	$(".versions").hide()
 	getVersions()
 	$("#versions-button").on('click', () => {
-		$("#versions").toggle()
+		$(".versions").toggle()
 		var content = $('#versions-button').html()
 		if (content == "Show XR Versions"){
 			$('#versions-button').html("Hide XR Versions")
@@ -38,7 +29,4 @@ $(document).ready(() => {
 			$('#versions-button').html("Show XR Versions")
 		}
 	});
-	$('#gender').dropdown();
-	$('#states').dropdown();
-	$('#language').dropdown();
 })

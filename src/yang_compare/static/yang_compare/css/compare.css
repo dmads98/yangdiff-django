@@ -1,5 +1,14 @@
-#space-button {
-  margin: 20em 10em;
+#placeholder {
+  margin: 10em 5em;
+}
+
+#versions-button{
+  margin: 1em 1em;
+}
+
+#versions{
+  margin: 1em 1em;
+  max-width: 300px;
 }
 
 #jumbo{

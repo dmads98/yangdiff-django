@@ -18,30 +18,63 @@ Yang File Compare
     <h1 class="ui header">
       Yang Compare
     </h1>
-    <h2>Sample Text.</h2>
+    <h2>Sample Text</h2>
     <div class="ui huge secondary button">Get Started <i class="right arrow icon"></i></div>
   </div>
 
 </div>
 
-<div id="space-button" class="ui huge primary button">Run Shit <i class="right arrow icon"></i></div>
-  
+<div id="placeholder" class="ui placeholder">
+  <div class="image header">
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+  <div class="paragraph">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+  <div class="image header">
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+  <div class="paragraph">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+</div>
 
 <hr>
-<button type="button" class="btn btn-primary" id="myClickButton">Show XR Versions</button>
-<div id="versions" class="card" style="width: 18rem;">
+<button class="ui primary button" id="versions-button">Show XR Versions</button>
+
+<div id="versions">	
+	<h3 class="ui top attached header versions">
+	  Versions
+	</h3>
+	<div class="ui attached raised segment versions">
+	 	<div id="versions-list" class="ui divided relaxed list">
+
+		</div>
+	</div>
+</div>
+<!-- <div id="versions" class="card" style="width: 18rem;">
   <div class="card-header">
     Versions
   </div>
   <ul id="versions-list" class="list-group list-group-flush">
     
   </ul>
-</div>
+</div> -->
 
 
 {% endblock %}
 
 {% block script %}
-<!-- <script src="{% static 'yang_compare/js/compare.js' %}"></script> -->
+<script src="{% static 'yang_compare/js/compare.js' %}"></script>
 
 {% endblock %}
