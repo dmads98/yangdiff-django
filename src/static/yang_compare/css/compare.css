@@ -9,10 +9,12 @@
 #versions{
   margin: 1em 1em;
   max-width: 300px;
+  display: none;
 }
 
-#search-drop{
-  margin: 10em 5em;
+#version-dropdown{
+  margin: 10em 7em;
+  max-width: 400px;
 }
 
 #jumbo{
@@ -48,11 +50,11 @@
     font-size: 1rem;
   }
   .masthead h1.ui.header {
-    font-size: 2em;
+    font-size: 2.5em;
     margin-top: 2.5em;
   }
   .masthead h2 {
     margin-top: 0.5em;
-    font-size: 1.5em;
+    font-size: 1em;
   }
 }

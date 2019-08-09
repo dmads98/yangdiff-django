@@ -12,9 +12,17 @@
   display: none;
 }
 
-#search-dropdown{
-  margin: 10em 7em;
-  max-width: 400px;
+#version-dropdown1, #version-dropdown2{
+  margin: 10em 5em;
+  /*max-width: 400px;*/
+}
+
+#file-dropdown1, #file-dropdown2{
+  min-width: 500px;
+}
+
+.ui.warning.message{
+  display: none;
 }
 
 #jumbo{
@@ -50,11 +58,11 @@
     font-size: 1rem;
   }
   .masthead h1.ui.header {
-    font-size: 2em;
+    font-size: 2.5em;
     margin-top: 2.5em;
   }
   .masthead h2 {
     margin-top: 0.5em;
-    font-size: 1.5em;
+    font-size: 1em;
   }
 }

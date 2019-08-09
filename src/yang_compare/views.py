@@ -18,7 +18,7 @@ def compare_page(request):
 def getDropDownVersions(request):
 	if request.method == "GET" and request.is_ajax():
 		results = []
-		vers_req = requests.get('https://api.github.com/repos/YangModels/yang/contents/vendor/cisco/xr')
+		vers_req = requests.get('https://api.github.com/repos/YangModels/yang/contents/vendor/cisco/xr', auth=('dmads98', MY_TOKEN))
 		json = vers_req.json()
 		for el in json:
 			if (el["type"] == "dir"):
@@ -30,8 +30,22 @@ def getDropDownVersions(request):
 		return JsonResponse({"success": True, "results": results}, status=200)
 	return JsonResponse({"success": False}, status=400)
 
+def getDropDownFiles(request, vers):
+	if request.method == "GET" and request.is_ajax():
+		results = []
+		file_req = requests.get('https://api.github.com/repos/YangModels/yang/contents/vendor/cisco/xr/' + vers, auth=('dmads98', MY_TOKEN))
+		json = file_req.json()
+		for el in json:
+			if (el["name"].endswith(".yang")):
+				results.append({
+					"name": el["name"][:-5],
+					"value": el["name"],
+					"text": el["name"][:-5]
+					})
+		return JsonResponse({"success": True, "results": results}, status=200)
+	return JsonResponse({"success": False}, status=400)
+
 def getVersions(request):
-	req = requests.get("https://api.github.com/rate_limit", auth=('dmads98', MY_TOKEN))
 	if request.method == "GET" and request.is_ajax():
 		vers_req = requests.get('https://api.github.com/repos/YangModels/yang/contents/vendor/cisco/xr')
 		json = vers_req.json()
