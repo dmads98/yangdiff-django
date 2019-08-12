@@ -3,7 +3,6 @@ var getVersions = function(){
     	url: 'ajax/test',
     	type: 'GET',
     	success: function(response){
-    		console.log(response);
     		let list = '';
         	response.versions.forEach(vers => {
         		list += `<div class="item">${vers}</div>`;
@@ -17,16 +16,17 @@ var getVersions = function(){
 };
 
 var findDiff = function(){
+	url = 'ajax/findDiff/' + 
+		$('#version-dropdown1').dropdown('get value') + '/' +
+		$('#file-dropdown1').dropdown('get value') + '/' +
+		$('#version-dropdown2').dropdown('get value') + '/' +
+		$('#file-dropdown2').dropdown('get value');
+	console.log(url)
     $.ajax({
-    	url: 'ajax/findDiff',
+    	url: url,
     	type: 'GET',
     	success: function(response){
     		console.log(response);
-    		let list = '';
-        	response.versions.forEach(vers => {
-        		list += `<div class="item">${vers}</div>`;
-			});
-    		$('#versions-list').append(list);
     	},
     	error : function(response){
 			console.log(response)
@@ -69,12 +69,13 @@ $(document).ready(() => {
 	});
 
 	$('#version-value1').on('change', () => {
+		$('#file-dropdown1 .menu').empty()
+		$('#file-dropdown1').dropdown('clear')
 		if($('#version-dropdown1').dropdown('get value') == ""){
 			$('#file-dropdown1').addClass('disabled')
-			$('#file-dropdown1').dropdown('clear')
 		}
 		else{
-			var url = '/compare/ajax/files/' + $('#version-value1').attr('value');
+			var url = '/compare/ajax/files/' + $('#version-dropdown1').dropdown('get value');
 			$('#file-dropdown1').removeClass('disabled')
 			$('#file-dropdown1').dropdown({
 				forceSelection: false,
@@ -103,12 +104,13 @@ $(document).ready(() => {
 	});
 
 	$('#version-value2').on('change', () => {
+		$('#file-dropdown2 .menu').empty()
+		$('#file-dropdown2').dropdown('clear')
 		if($('#version-dropdown2').dropdown('get value') == ""){
 			$('#file-dropdown2').addClass('disabled')
-			$('#file-dropdown2').dropdown('clear')
 		}
 		else{
-			var url = '/compare/ajax/files/' + $('#version-value2').attr('value');
+			var url = '/compare/ajax/files/' + $('#version-dropdown2').dropdown('get value');
 			$('#file-dropdown2').removeClass('disabled')
 			$('#file-dropdown2').dropdown({
 				forceSelection: false,
@@ -132,7 +134,8 @@ $(document).ready(() => {
 			$('.ui.warning.message').show()
 		}
 		else{
-			$('.ui.warning.message').hide()
+			$('.ui.warning.message').hide();
+			findDiff()
 		}
 	})
 
@@ -147,6 +150,21 @@ $(document).ready(() => {
 		$('#version-dropdown2').dropdown('clear')
 		$('#file-dropdown1').dropdown('clear')
 		$('#file-dropdown2').dropdown('clear')
+	})
+
+	$('#view-file-btn1').on('click', () => {
+		console.log("test")
+		// var url = '/compare/ajax/view/' + $('#version-dropdown1').dropdown('get value') + '/' + $('#file-dropdown1').dropdown('get value');
+		// $.ajax({
+  //   	url: url,
+  //   	type: 'GET',
+  //   	success: function(response){
+  //   		console.log(response)
+  //   	},
+  //   	error : function(response){
+		// 	console.log(response)
+		// }
+    // });
 	})
 	
 })

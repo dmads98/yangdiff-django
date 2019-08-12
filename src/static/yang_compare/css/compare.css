@@ -12,9 +12,17 @@
   display: none;
 }
 
-#version-dropdown{
-  margin: 10em 7em;
-  max-width: 400px;
+#version-dropdown1, #version-dropdown2{
+  margin: 10em 5em;
+  /*max-width: 400px;*/
+}
+
+#file-dropdown1, #file-dropdown2{
+  min-width: 500px;
+}
+
+.ui.warning.message{
+  display: none;
 }
 
 #jumbo{
