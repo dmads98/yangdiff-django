@@ -34,6 +34,30 @@ var findDiff = function(){
     });
 };
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function handleModal(id){
+	if ($('#file-view' + id + ' pre').html() == ""){
+		var url = '/compare/ajax/view/' + $('#version-dropdown' + id).dropdown('get value') + '/' + $('#file-dropdown' + id).dropdown('get value');
+		$.ajax({
+	    	url: url,
+	    	type: 'GET',
+	    	success: function(response){
+	    		$('#file-view' + id + ' pre').append(response.content)
+	    	},
+	    	error : function(response){
+				console.log(response)
+			}
+    	});
+    	await sleep(300)
+	}
+	if ($('#file-view' + id + ' pre').html() != ""){
+		$('#file-view' + id).modal('show')
+	}
+}
+
 $(document).ready(() => {
 	getVersions()
 	$("#versions-button").on('click', () => {
@@ -91,6 +115,16 @@ $(document).ready(() => {
 		}
 	})
 
+	$('#file-dropdown1').on('change', () => {
+		$('#file-view1 pre').empty()
+		if ($('#file-dropdown1').dropdown('get value') != ""){
+			$('#view-file-btn1').removeClass('disabled')
+		}
+		else{
+			$('#view-file-btn1').addClass('disabled')
+		}
+	})
+
 	$('#version-dropdown2').dropdown({
 		forceSelection: false,
 		clearable: true,
@@ -126,6 +160,16 @@ $(document).ready(() => {
 		}
 	})
 
+	$('#file-dropdown2').on('change', () => {
+		$('#file-view2 pre').empty()
+		if ($('#file-dropdown2').dropdown('get value') != ""){
+			$('#view-file-btn2').removeClass('disabled')
+		}
+		else{
+			$('#view-file-btn2').addClass('disabled')
+		}
+	})
+
 	$('#compare-btn').on('click', () => {
 		if (($('#version-dropdown1').dropdown('get value') == "") ||
 			($('#version-dropdown2').dropdown('get value') == "") ||
@@ -143,8 +187,6 @@ $(document).ready(() => {
 		$('.ui.warning.message').hide();
 	})
 
-
-
 	$('#clear-btn').on('click', () => {
 		$('#version-dropdown1').dropdown('clear')
 		$('#version-dropdown2').dropdown('clear')
@@ -153,18 +195,15 @@ $(document).ready(() => {
 	})
 
 	$('#view-file-btn1').on('click', () => {
-		console.log("test")
-		// var url = '/compare/ajax/view/' + $('#version-dropdown1').dropdown('get value') + '/' + $('#file-dropdown1').dropdown('get value');
-		// $.ajax({
-  //   	url: url,
-  //   	type: 'GET',
-  //   	success: function(response){
-  //   		console.log(response)
-  //   	},
-  //   	error : function(response){
-		// 	console.log(response)
-		// }
-    // });
+		handleModal(1)
+	})
+
+	$('#view-file-btn2').on('click', () => {
+		handleModal(2)
+	})
+
+	$('#compare-btn').on('click', () => {
+		$('.ui.modal').modal('show')
 	})
 	
 })

@@ -48,7 +48,7 @@ def getDropDownFiles(request, vers):
 
 def getVersions(request):
 	if request.method == "GET" and request.is_ajax():
-		vers_req = requests.get('https://api.github.com/repos/YangModels/yang/contents/vendor/cisco/xr')
+		vers_req = requests.get('https://api.github.com/repos/YangModels/yang/contents/vendor/cisco/xr', auth=('dmads98', MY_TOKEN))
 		json = vers_req.json()
 		versions = []
 		for el in json:
@@ -60,10 +60,8 @@ def getVersions(request):
 def getFileContent(request, vers, file):
 	if request.method == "GET" and request.is_ajax():
 		url = "https://raw.githubusercontent.com/YangModels/yang/master/vendor/cisco/xr/" + vers + "/" + file
-		print(url)
 		content_req = requests.get(url)
-		print(content_req)
-		return JsonResponse({"success": True, "results" :[]}, status=200)
+		return JsonResponse({"success": True, "content": content_req.text}, status=200)
 	return JsonResponse({"success": False}, status=400)
 
 def compareFiles(request, oldvers, oldfile, newvers, newfile):

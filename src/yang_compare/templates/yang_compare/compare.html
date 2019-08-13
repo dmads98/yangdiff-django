@@ -43,9 +43,22 @@ Yang File Compare
   <div class="default text">Select Yang File</div>
 </div>
 
-<button id="view-file-btn1" class="ui button">
+<button id="view-file-btn1" class="disabled ui button">
  	View File
 </button>
+
+<div id="file-view1" class="ui modal">
+  <div class="header">File Content</div>
+  <div class="scrolling content">
+    <pre></pre>
+  </div>
+  <div class="actions">
+    <div class="ui primary approve right labeled icon button">
+    	Continue
+    	<i class="checkmark icon"></i>
+	</div>
+  </div>
+</div>
 
 <hr>
 
@@ -59,6 +72,23 @@ Yang File Compare
   <input type="hidden" name="file">
   <i class="dropdown icon"></i>
   <div class="default text">Select Yang File</div>
+</div>
+
+<button id="view-file-btn2" class="disabled ui button">
+ 	View File
+</button>
+
+<div id="file-view2" class="ui modal">
+  <div class="header">File Content</div>
+  <div class="scrolling content">
+    <pre></pre>
+  </div>
+  <div class="actions">
+    <div class="ui primary approve right labeled icon button">
+    	Continue
+    	<i class="checkmark icon"></i>
+	</div>
+  </div>
 </div>
 
 <button id="compare-btn" class="ui huge teal button">
