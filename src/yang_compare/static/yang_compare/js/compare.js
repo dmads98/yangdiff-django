@@ -183,6 +183,11 @@ $(document).ready(() => {
 		}
 	})
 
+	$('.ui.dropdown').on('change', () => {
+		$('#diff  pre').empty()
+		$('#diff').hide()
+	})
+
 	$('.ui.warning.message .icon').on('click', () => {
 		$('.ui.warning.message').hide();
 	})
@@ -194,16 +199,16 @@ $(document).ready(() => {
 		$('#file-dropdown2').dropdown('clear')
 	})
 
+	$('#same-file-btn').on('click', () => {
+		
+	})
+
 	$('#view-file-btn1').on('click', () => {
 		handleModal(1)
 	})
 
 	$('#view-file-btn2').on('click', () => {
 		handleModal(2)
-	})
-
-	$('#compare-btn').on('click', () => {
-		$('.ui.modal').modal('show')
 	})
 	
 })
