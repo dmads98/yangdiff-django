@@ -21,7 +21,11 @@
   min-width: 500px;
 }
 
-.ui.warning.message{
+#error-msg pre{
+  font-family: Lato,'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.ui.diff.message{
   display: none;
 }
 

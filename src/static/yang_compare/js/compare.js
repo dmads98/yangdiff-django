@@ -16,23 +16,63 @@ var getVersions = function(){
 };
 
 var findDiff = function(){
+	$('#compare-btn').addClass('loading')
+	$('#diff pre').empty()
 	url = 'ajax/findDiff/' + 
 		$('#version-dropdown1').dropdown('get value') + '/' +
 		$('#file-dropdown1').dropdown('get value') + '/' +
 		$('#version-dropdown2').dropdown('get value') + '/' +
 		$('#file-dropdown2').dropdown('get value');
-	console.log(url)
     $.ajax({
     	url: url,
     	type: 'GET',
     	success: function(response){
-    		console.log(response);
+    		console.log(response)
+    		if (response.errors.length != 0){
+    			$('#error-msg pre').empty()
+    			response.errors.forEach(function(element) {
+    				$('#error-msg pre').append(element + "\n")
+  					console.log(element);
+				});
+    			$('#error-msg').show()
+    		}
+    		else{
+    			$('#diff pre').append(response.diff)
+    			$('#diff').show()
+    		}
+    		$('#compare-btn').removeClass('loading')
     	},
     	error : function(response){
 			console.log(response)
 		}
     });
 };
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function handleModal(id){
+	if ($('#file-view' + id + ' pre').html() == ""){
+		var url = '/compare/ajax/view/' + $('#version-dropdown' + id).dropdown('get value') + '/' + $('#file-dropdown' + id).dropdown('get value');
+		$.ajax({
+	    	url: url,
+	    	type: 'GET',
+	    	success: function(response){
+	    		$('#file-view' + id + ' pre').append(response.content)
+	    		$('#file-view' + id).modal('show')
+	    	},
+	    	error : function(response){
+				console.log(response)
+			}
+    	});
+	}
+	else{
+		$('#file-view' + id).modal('show')
+	}
+}
+
+var inputChanged = false;
 
 $(document).ready(() => {
 	getVersions()
@@ -91,6 +131,16 @@ $(document).ready(() => {
 		}
 	})
 
+	$('#file-dropdown1').on('change', () => {
+		$('#file-view1 pre').empty()
+		if ($('#file-dropdown1').dropdown('get value') != ""){
+			$('#view-file-btn1').removeClass('disabled')
+		}
+		else{
+			$('#view-file-btn1').addClass('disabled')
+		}
+	})
+
 	$('#version-dropdown2').dropdown({
 		forceSelection: false,
 		clearable: true,
@@ -126,24 +176,49 @@ $(document).ready(() => {
 		}
 	})
 
-	$('#compare-btn').on('click', () => {
-		if (($('#version-dropdown1').dropdown('get value') == "") ||
-			($('#version-dropdown2').dropdown('get value') == "") ||
-			($('#file-dropdown1').dropdown('get value') == "") ||
-			($('#file-dropdown2').dropdown('get value') == "")){
-			$('.ui.warning.message').show()
+	$('#file-dropdown2').on('change', () => {
+		$('#file-view2 pre').empty()
+		if ($('#file-dropdown2').dropdown('get value') != ""){
+			$('#view-file-btn2').removeClass('disabled')
 		}
 		else{
-			$('.ui.warning.message').hide();
-			findDiff()
+			$('#view-file-btn2').addClass('disabled')
 		}
 	})
 
-	$('.ui.warning.message .icon').on('click', () => {
-		$('.ui.warning.message').hide();
+	$('#compare-btn').on('click', () => {
+		$('.ui.diff.message').hide();
+		if(inputChanged){
+			inputChanged = false;
+			$('#diff').hide()
+			if (($('#version-dropdown1').dropdown('get value') == "") ||
+				($('#version-dropdown2').dropdown('get value') == "") ||
+				($('#file-dropdown1').dropdown('get value') == "") ||
+				($('#file-dropdown2').dropdown('get value') == "")){
+				$('#files-missing-msg').show()
+			}
+			else if (($('#version-dropdown1').dropdown('get value') == $('#version-dropdown2').dropdown('get value')) &&
+				($('#file-dropdown1').dropdown('get value') == $('#file-dropdown2').dropdown('get value'))) {
+				$('#same-file-msg').show()
+			}
+			else{
+				findDiff()
+			}
+		}
+		else{
+			if ($('#error-msg pre').html() != ""){
+				$('#error-msg').show()
+			}
+		}
 	})
 
+	$('.ui.dropdown').on('change', () => {
+		inputChanged = true;
+	})
 
+	$('.ui.diff.message .icon').on('click', () => {
+		$('.ui.diff.message').hide();
+	})
 
 	$('#clear-btn').on('click', () => {
 		$('#version-dropdown1').dropdown('clear')
@@ -152,19 +227,16 @@ $(document).ready(() => {
 		$('#file-dropdown2').dropdown('clear')
 	})
 
+	// $('#same-file-btn').on('click', () => {
+
+	// })
+
 	$('#view-file-btn1').on('click', () => {
-		console.log("test")
-		// var url = '/compare/ajax/view/' + $('#version-dropdown1').dropdown('get value') + '/' + $('#file-dropdown1').dropdown('get value');
-		// $.ajax({
-  //   	url: url,
-  //   	type: 'GET',
-  //   	success: function(response){
-  //   		console.log(response)
-  //   	},
-  //   	error : function(response){
-		// 	console.log(response)
-		// }
-    // });
+		handleModal(1)
+	})
+
+	$('#view-file-btn2').on('click', () => {
+		handleModal(2)
 	})
 	
 })

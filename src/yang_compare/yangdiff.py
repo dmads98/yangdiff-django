@@ -6,14 +6,18 @@ def fileCompare(oldvers, oldfile, newvers, newfile):
 	header = "false"
 	create_yang_old_directory()
 	create_yang_new_directory()
-	getAndOrModifyFiles(oldvers, oldfile, True)
-	getAndOrModifyFiles(newvers, newfile, False)
+	result = getAndOrModifyFiles(oldvers, oldfile, True)
+	if result['errors']:
+		return {"output": "", "errors": result["errors"]}
+	result = getAndOrModifyFiles(newvers, newfile, False)
+	if result['errors']:
+		return {"output": "", "errors": result["errors"]}
 	result = check_for_valid_files(oldfile[:-5] + "-" + oldvers, "yang_old")
 	if result['errors']:
-		return result
+		return {"output": "", "errors": result["errors"]}
 	result = check_for_valid_files(newfile[:-5], "yang_new")
 	if result['errors']:
-		return result
+		return {"output": "", "errors": result["errors"]}
 	subpr = subprocess.run([
 		"yangdiff-pro",
 		"--old=yang_old/" + oldfile[:-5] + "-" + oldvers + ".yang",
@@ -51,7 +55,6 @@ def delete_yang_directories():
 		"-r",
 		"yang_new"])
 
-
 def getAndOrModifyFiles(vers, file, old):
 	file_list = [file[:-5]]
 	completed = set()
@@ -65,6 +68,8 @@ def getAndOrModifyFiles(vers, file, old):
 			f = open("yang_new/" + cur + ".yang", "w+")
 		url = "https://raw.githubusercontent.com/YangModels/yang/master/vendor/cisco/xr/" + vers + "/" + cur + ".yang"
 		content = requests.get(url)
+		if (content.status_code == 404):
+			return {"errors": ["File Not Found: " + vers + "/" + cur + ".yang"]}
 		header_parsed = False
 		filename_parsed = False
 		for line in content.text.splitlines(True):
@@ -93,6 +98,7 @@ def getAndOrModifyFiles(vers, file, old):
 			f.write(line)
 		f.close()
 		completed.add(cur)
+	return {"errors": []}
 
 def modify_line(line, vers):
 	words = line.split()
@@ -133,9 +139,13 @@ def check_for_valid_files(file, dir_name):
 
 def main():
 	delete_yang_directories()
-	result = fileCompare("633", "Cisco-IOS-XR-cdp-oper.yang", "652", "Cisco-IOS-XR-cdp-oper.yang")
+	result = fileCompare("600", "Cisco-IOS-XR-Ethernet-SPAN-cfg.yang", "602", "Cisco-IOS-XR-Ethernet-SPAN-cfg.yang")
 	print(result)
 
 if __name__ == "__main__":
 	main()
+	# result = {"errors":  ["Please select a primary module to compare. You have selected a submodule or types file." +
+	# 		"\nA node tree cannot be constructed from this file."]}
+	# test = {"output": "", "errors": result["errors"]}
+	# print(test["errors"])
 

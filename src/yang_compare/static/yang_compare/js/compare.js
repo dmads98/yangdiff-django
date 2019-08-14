@@ -16,6 +16,7 @@ var getVersions = function(){
 };
 
 var findDiff = function(){
+	$('#compare-btn').addClass('loading')
 	$('#diff pre').empty()
 	url = 'ajax/findDiff/' + 
 		$('#version-dropdown1').dropdown('get value') + '/' +
@@ -26,13 +27,20 @@ var findDiff = function(){
     	url: url,
     	type: 'GET',
     	success: function(response){
+    		console.log(response)
     		if (response.errors.length != 0){
+    			$('#error-msg pre').empty()
+    			response.errors.forEach(function(element) {
+    				$('#error-msg pre').append(element + "\n")
+  					console.log(element);
+				});
     			$('#error-msg').show()
     		}
     		else{
     			$('#diff pre').append(response.diff)
     			$('#diff').show()
     		}
+    		$('#compare-btn').removeClass('loading')
     	},
     	error : function(response){
 			console.log(response)
@@ -179,7 +187,7 @@ $(document).ready(() => {
 	})
 
 	$('#compare-btn').on('click', () => {
-		$('.ui.warning.message').hide();
+		$('.ui.diff.message').hide();
 		if(inputChanged){
 			inputChanged = false;
 			$('#diff').hide()
@@ -197,14 +205,19 @@ $(document).ready(() => {
 				findDiff()
 			}
 		}
+		else{
+			if ($('#error-msg pre').html() != ""){
+				$('#error-msg').show()
+			}
+		}
 	})
 
 	$('.ui.dropdown').on('change', () => {
 		inputChanged = true;
 	})
 
-	$('.ui.warning.message .icon').on('click', () => {
-		$('.ui.warning.message').hide();
+	$('.ui.diff.message .icon').on('click', () => {
+		$('.ui.diff.message').hide();
 	})
 
 	$('#clear-btn').on('click', () => {
