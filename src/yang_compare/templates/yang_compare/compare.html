@@ -103,12 +103,28 @@ Yang File Compare
  	Compare Same File
 </button>
 
-<div class="ui compact warning message">
+<div id="files-missing-msg" class="ui compact warning message">
   <i class="close icon"></i>
   <div class="header">
      Please select files to compare.
   </div>
   Two files must be chosen.
+</div>
+
+<div id="same-file-msg" class="ui compact warning message">
+  <i class="close icon"></i>
+  <div class="header">
+  	Please select unique files.
+  </div>
+  The same file has been chosen twice.
+</div>
+
+<div id="error-msg" class="ui compact warning message">
+  <i class="close icon"></i>
+  <div class="header">
+  	Error Occured.
+  </div>
+  Sample Text
 </div>
 
 <div id="diff">

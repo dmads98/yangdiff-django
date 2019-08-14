@@ -16,17 +16,23 @@ var getVersions = function(){
 };
 
 var findDiff = function(){
+	$('#diff pre').empty()
 	url = 'ajax/findDiff/' + 
 		$('#version-dropdown1').dropdown('get value') + '/' +
 		$('#file-dropdown1').dropdown('get value') + '/' +
 		$('#version-dropdown2').dropdown('get value') + '/' +
 		$('#file-dropdown2').dropdown('get value');
-	console.log(url)
     $.ajax({
     	url: url,
     	type: 'GET',
     	success: function(response){
-    		console.log(response);
+    		if (response.errors.length != 0){
+    			$('#error-msg').show()
+    		}
+    		else{
+    			$('#diff pre').append(response.diff)
+    			$('#diff').show()
+    		}
     	},
     	error : function(response){
 			console.log(response)
@@ -38,7 +44,7 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function handleModal(id){
+function handleModal(id){
 	if ($('#file-view' + id + ' pre').html() == ""){
 		var url = '/compare/ajax/view/' + $('#version-dropdown' + id).dropdown('get value') + '/' + $('#file-dropdown' + id).dropdown('get value');
 		$.ajax({
@@ -46,17 +52,19 @@ async function handleModal(id){
 	    	type: 'GET',
 	    	success: function(response){
 	    		$('#file-view' + id + ' pre').append(response.content)
+	    		$('#file-view' + id).modal('show')
 	    	},
 	    	error : function(response){
 				console.log(response)
 			}
     	});
-    	await sleep(300)
 	}
-	if ($('#file-view' + id + ' pre').html() != ""){
+	else{
 		$('#file-view' + id).modal('show')
 	}
 }
+
+var inputChanged = false;
 
 $(document).ready(() => {
 	getVersions()
@@ -171,21 +179,28 @@ $(document).ready(() => {
 	})
 
 	$('#compare-btn').on('click', () => {
-		if (($('#version-dropdown1').dropdown('get value') == "") ||
-			($('#version-dropdown2').dropdown('get value') == "") ||
-			($('#file-dropdown1').dropdown('get value') == "") ||
-			($('#file-dropdown2').dropdown('get value') == "")){
-			$('.ui.warning.message').show()
-		}
-		else{
-			$('.ui.warning.message').hide();
-			findDiff()
+		$('.ui.warning.message').hide();
+		if(inputChanged){
+			inputChanged = false;
+			$('#diff').hide()
+			if (($('#version-dropdown1').dropdown('get value') == "") ||
+				($('#version-dropdown2').dropdown('get value') == "") ||
+				($('#file-dropdown1').dropdown('get value') == "") ||
+				($('#file-dropdown2').dropdown('get value') == "")){
+				$('#files-missing-msg').show()
+			}
+			else if (($('#version-dropdown1').dropdown('get value') == $('#version-dropdown2').dropdown('get value')) &&
+				($('#file-dropdown1').dropdown('get value') == $('#file-dropdown2').dropdown('get value'))) {
+				$('#same-file-msg').show()
+			}
+			else{
+				findDiff()
+			}
 		}
 	})
 
 	$('.ui.dropdown').on('change', () => {
-		$('#diff  pre').empty()
-		$('#diff').hide()
+		inputChanged = true;
 	})
 
 	$('.ui.warning.message .icon').on('click', () => {
@@ -199,9 +214,9 @@ $(document).ready(() => {
 		$('#file-dropdown2').dropdown('clear')
 	})
 
-	$('#same-file-btn').on('click', () => {
-		
-	})
+	// $('#same-file-btn').on('click', () => {
+
+	// })
 
 	$('#view-file-btn1').on('click', () => {
 		handleModal(1)

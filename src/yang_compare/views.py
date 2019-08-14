@@ -67,9 +67,8 @@ def getFileContent(request, vers, file):
 
 def compareFiles(request, oldvers, oldfile, newvers, newfile):
 	if request.method == "GET" and request.is_ajax():
-		# result = fileCompare(oldvers, oldfile, newvers, newfile)
-		# return JsonResponse({"success": True, "diff": result.diff, "error": result.error}, status=200)
-		return JsonResponse({"success": True, "results": []}, status=200)
+		result = fileCompare(oldvers, oldfile, newvers, newfile)
+		return JsonResponse({"success": True, "diff": result["output"], "errors": result["errors"]}, status=200)
 	return JsonResponse({"success": False}, status=400)
 
 
