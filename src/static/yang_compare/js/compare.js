@@ -1,19 +1,19 @@
-var getVersions = function(){
-    $.ajax({
-    	url: 'ajax/test',
-    	type: 'GET',
-    	success: function(response){
-    		let list = '';
-        	response.versions.forEach(vers => {
-        		list += `<div class="item">${vers}</div>`;
-			});
-    		$('#versions-list').append(list);
-    	},
-    	error : function(response){
-			console.log(response)
-		}
-    });
-};
+// var getVersions = function(){
+//     $.ajax({
+//     	url: 'ajax/test',
+//     	type: 'GET',
+//     	success: function(response){
+//     		let list = '';
+//         	response.versions.forEach(vers => {
+//         		list += `<div class="item">${vers}</div>`;
+// 			});
+//     		$('#versions-list').append(list);
+//     	},
+//     	error : function(response){
+// 			console.log(response)
+// 		}
+//     });
+// };
 
 var findDiff = function(){
 	$('#compare-btn').addClass('loading')
@@ -27,12 +27,10 @@ var findDiff = function(){
     	url: url,
     	type: 'GET',
     	success: function(response){
-    		console.log(response)
     		if (response.errors.length != 0){
     			$('#error-msg pre').empty()
     			response.errors.forEach(function(element) {
     				$('#error-msg pre').append(element + "\n")
-  					console.log(element);
 				});
     			$('#error-msg').show()
     		}
@@ -48,9 +46,9 @@ var findDiff = function(){
     });
 };
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+// function sleep(ms) {
+//   return new Promise(resolve => setTimeout(resolve, ms));
+// }
 
 function handleModal(id){
 	if ($('#file-view' + id + ' pre').html() == ""){
@@ -75,7 +73,6 @@ function handleModal(id){
 var inputChanged = false;
 
 $(document).ready(() => {
-	getVersions()
 	$("#versions-button").on('click', () => {
 		$("#versions").toggle()
 		var content = $('#versions-button').html()
@@ -187,33 +184,51 @@ $(document).ready(() => {
 	})
 
 	$('#compare-btn').on('click', () => {
-		$('.ui.diff.message').hide();
-		if(inputChanged){
-			inputChanged = false;
-			$('#diff').hide()
-			if (($('#version-dropdown1').dropdown('get value') == "") ||
+		if (($('#version-dropdown1').dropdown('get value') == "") ||
 				($('#version-dropdown2').dropdown('get value') == "") ||
 				($('#file-dropdown1').dropdown('get value') == "") ||
 				($('#file-dropdown2').dropdown('get value') == "")){
-				$('#files-missing-msg').show()
-			}
-			else if (($('#version-dropdown1').dropdown('get value') == $('#version-dropdown2').dropdown('get value')) &&
+			$('#files-missing-msg').show()
+		}
+		else if (($('#version-dropdown1').dropdown('get value') == $('#version-dropdown2').dropdown('get value')) &&
 				($('#file-dropdown1').dropdown('get value') == $('#file-dropdown2').dropdown('get value'))) {
-				$('#same-file-msg').show()
-			}
-			else{
-				findDiff()
-			}
+			$('#same-file-msg').show()
 		}
-		else{
-			if ($('#error-msg pre').html() != ""){
-				$('#error-msg').show()
-			}
+		else if (inputChanged) {
+			inputChanged = false;
+			$('#diff').hide()
+			findDiff()
 		}
+	})
+
+	$('#download-btn').on('click', () => {
+		// Create an invisible A element
+		const $temp = $("<a>", {id: "download-temp"});
+		$temp.hide()
+		$('body').append($temp);
+
+		// Set the HREF to a Blob representation of the data to be downloaded
+		$("#download-temp").attr("href", window.URL.createObjectURL(new Blob([$('#diff pre').html()], {type: "text/plain"})));
+
+		// Use download attribute to set desired file name
+		let filename = $('#version-dropdown1').dropdown('get text') + "_" + 
+			$('#file-dropdown1').dropdown('get text') + "_" + 
+			$('#version-dropdown2').dropdown('get text') + "_" + 
+			$('#file-dropdown2').dropdown('get text') + "_diff" + ".txt"
+		$("#download-temp").attr("download", filename);
+
+		// Trigger the download by simulating click
+		// Can simulate click on jquery anchor element for security reasons
+		document.getElementById('download-temp').click();
+
+		// Cleanup
+		window.URL.revokeObjectURL($("#download-temp").attr("href"));
+		$("#download-temp").remove();
 	})
 
 	$('.ui.dropdown').on('change', () => {
 		inputChanged = true;
+		$('.ui.diff.message').hide()
 	})
 
 	$('.ui.diff.message .icon').on('click', () => {
