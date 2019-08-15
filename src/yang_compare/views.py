@@ -4,7 +4,7 @@ import requests
 import json
 from django.conf import settings
 import subprocess
-from .yangdiff import fileCompare
+from .yangdiff import fileCompare, emptyYangDirectories
 
 # Create your views here.
 
@@ -47,17 +47,6 @@ def getDropDownFiles(request, vers):
 		return JsonResponse({"success": True, "results": results}, status=200)
 	return JsonResponse({"success": False}, status=400)
 
-def getVersions(request):
-	if request.method == "GET" and request.is_ajax():
-		vers_req = requests.get('https://api.github.com/repos/YangModels/yang/contents/vendor/cisco/xr', auth=('dmads98', MY_TOKEN))
-		json = vers_req.json()
-		versions = []
-		for el in json:
-			if (el["type"] == "dir"):
-				versions.append((el["name"]))
-		return JsonResponse({"success": True, "versions" :versions}, status=200)
-	return JsonResponse({"success": False}, status=400)
-
 def getFileContent(request, vers, file):
 	if request.method == "GET" and request.is_ajax():
 		url = "https://raw.githubusercontent.com/YangModels/yang/master/vendor/cisco/xr/" + vers + "/" + file
@@ -68,6 +57,7 @@ def getFileContent(request, vers, file):
 def compareFiles(request, oldvers, oldfile, newvers, newfile):
 	if request.method == "GET" and request.is_ajax():
 		result = fileCompare(oldvers, oldfile, newvers, newfile)
+		emptyYangDirectories()
 		return JsonResponse({"success": True, "diff": result["output"], "errors": result["errors"]}, status=200)
 	return JsonResponse({"success": False}, status=400)
 

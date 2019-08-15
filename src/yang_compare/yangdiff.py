@@ -4,8 +4,6 @@ import requests
 def fileCompare(oldvers, oldfile, newvers, newfile):
 	diff_type = "normal"
 	header = "false"
-	create_yang_old_directory()
-	create_yang_new_directory()
 	result = getAndOrModifyFiles(oldvers, oldfile, True)
 	if result['errors']:
 		return {"output": "", "errors": result["errors"]}
@@ -33,27 +31,31 @@ def fileCompare(oldvers, oldfile, newvers, newfile):
 		error = error[:1].upper() + error[1:]
 		error = error.strip('\n')
 		errors.append(error)
-	return {"output": output, "errors": errors}
+	return {"output": cleanHeader(output, oldvers, newvers), "errors": errors}
 
-def create_yang_old_directory():
-	subpr = subprocess.run([
-		"mkdir",
-		"yang_old"])
+def cleanHeader(output, oldvers, newvers):
+	lines = output.splitlines()
+	oldHeader = lines[0].split()
+	oldHeader[2] = oldvers + "/" + oldHeader[2][:-(len(oldvers) + 1)]
+	oldHeader[4] = oldvers + "/" + oldHeader[4][:-(len(oldvers) + 1 + 5)] + ".yang"
+	lines[0] = ' '.join(oldHeader)
+	newHeader = lines[1].split()
+	newHeader[2] = newvers + "/" + newHeader[2]
+	newHeader[4] = newvers + "/" + newHeader[4]
+	lines[1] = ' '.join(newHeader)
+	return '\n'.join(lines)
 
-def create_yang_new_directory():
-	subpr = subprocess.run([
-		"mkdir",
-		"yang_new"])
+# def create_yang_directories():
+# 	subprocess.run([
+# 		"mkdir",
+# 		"yang_old"])
+# 	subprocess.run([
+# 		"mkdir",
+# 		"yang_new"])
 
-def delete_yang_directories():
-	subprocess.run([
-		"rm",
-		"-r",
-		"yang_old"])
-	subprocess.run([
-		"rm",
-		"-r",
-		"yang_new"])
+def emptyYangDirectories():
+	subprocess.call("rm -r yang_old/*", shell=True)
+	subprocess.call("rm -r yang_new/*", shell=True)
 
 def getAndOrModifyFiles(vers, file, old):
 	file_list = [file[:-5]]
@@ -138,14 +140,11 @@ def check_for_valid_files(file, dir_name):
 	return {"errors": []}
 
 def main():
-	delete_yang_directories()
+	emptyYangDirectories()
 	result = fileCompare("600", "Cisco-IOS-XR-Ethernet-SPAN-cfg.yang", "602", "Cisco-IOS-XR-Ethernet-SPAN-cfg.yang")
 	print(result)
 
 if __name__ == "__main__":
 	main()
-	# result = {"errors":  ["Please select a primary module to compare. You have selected a submodule or types file." +
-	# 		"\nA node tree cannot be constructed from this file."]}
-	# test = {"output": "", "errors": result["errors"]}
-	# print(test["errors"])
+	
 
