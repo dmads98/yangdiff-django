@@ -58,7 +58,7 @@ def compareFiles(request, oldvers, oldfile, newvers, newfile):
 	if request.method == "GET" and request.is_ajax():
 		result = fileCompare(oldvers, oldfile, newvers, newfile)
 		emptyYangDirectories()
-		return JsonResponse({"success": True, "diff": result["output"], "errors": result["errors"]}, status=200)
+		return JsonResponse({"success": True, "diff": result["output"], "errors": result["errors"], "warnings": result["warnings"]}, status=200)
 	return JsonResponse({"success": False}, status=400)
 
 

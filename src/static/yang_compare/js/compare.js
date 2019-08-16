@@ -27,6 +27,7 @@ var findDiff = function(){
     	url: url,
     	type: 'GET',
     	success: function(response){
+    		console.log(response)
     		if (response.errors.length != 0){
     			$('#error-msg pre').empty()
     			response.errors.forEach(function(element) {
@@ -35,6 +36,13 @@ var findDiff = function(){
     			$('#error-msg').show()
     		}
     		else{
+    			if (response.warnings.length != 0){
+	    			$('#post-diff-warning pre').empty()
+	    			response.warnings.forEach(function(element) {
+	    				$('#post-diff-warning pre').append(element + "\n")
+					});
+	    			$('#post-diff-warning').show()
+    			}		
     			$('#diff pre').append(response.diff)
     			$('#diff').show()
     		}

@@ -2,20 +2,25 @@ import subprocess
 import requests
 
 def fileCompare(oldvers, oldfile, newvers, newfile):
-	diff_type = "normal"
+	diff_type = "normal" #change to revision
 	header = "false"
+	warnings = []
 	result = getAndOrModifyFiles(oldvers, oldfile, True)
 	if result['errors']:
 		return {"output": "", "errors": result["errors"]}
 	result = getAndOrModifyFiles(newvers, newfile, False)
 	if result['errors']:
 		return {"output": "", "errors": result["errors"]}
-	result = check_for_valid_files(oldfile[:-5] + "-" + oldvers, "yang_old")
+	result = checkForValidFiles(oldfile[:-5] + "-" + oldvers, "yang_old")
 	if result['errors']:
 		return {"output": "", "errors": result["errors"]}
-	result = check_for_valid_files(newfile[:-5], "yang_new")
+	if result['warnings']:
+		warnings += result['warnings']
+	result = checkForValidFiles(newfile[:-5], "yang_new")
 	if result['errors']:
 		return {"output": "", "errors": result["errors"]}
+	if result['warnings']:
+		warnings += result['warnings']
 	subpr = subprocess.run([
 		"yangdiff-pro",
 		"--old=yang_old/" + oldfile[:-5] + "-" + oldvers + ".yang",
@@ -24,26 +29,37 @@ def fileCompare(oldvers, oldfile, newvers, newfile):
 		"--difftype=" + diff_type,
 		"--header=" + header], capture_output=True, text=True)
 	output = subpr.stdout.strip('\n')
+	print(output)
 	errors = []
 	if output.startswith("Error"):
-		print("Error(s) occurred - Comparison unsuccessful")
-		error = output[7:output.find("yangdiff")]
-		error = error[:1].upper() + error[1:]
-		error = error.strip('\n')
-		errors.append(error)
-	return {"output": cleanHeader(output, oldvers, newvers), "errors": errors}
+		errors.append("Comparison Unsuccessful")
+	return {"output": cleanOutput(output, oldvers, newvers), "errors": errors, "warnings": warnings}
 
-def cleanHeader(output, oldvers, newvers):
+def cleanOutput(output, oldvers, newvers):
+	result = []
+	i = 0
 	lines = output.splitlines()
-	oldHeader = lines[0].split()
-	oldHeader[2] = oldvers + "/" + oldHeader[2][:-(len(oldvers) + 1)]
-	oldHeader[4] = oldvers + "/" + oldHeader[4][:-(len(oldvers) + 1 + 5)] + ".yang"
-	lines[0] = ' '.join(oldHeader)
-	newHeader = lines[1].split()
-	newHeader[2] = newvers + "/" + newHeader[2]
-	newHeader[4] = newvers + "/" + newHeader[4]
-	lines[1] = ' '.join(newHeader)
-	return '\n'.join(lines)
+	while i < len(lines):
+		line = lines[i]
+		if line.startswith("Warning: Module") and line.endswith("not used"):
+			# this warning will be taken care of through pyang
+			i += 3
+			continue
+		if line.startswith("// old:"):
+			oldHeader = line.split()
+			oldHeader[2] = oldvers + "/" + oldHeader[2][:-(len(oldvers) + 1)]
+			oldHeader[4] = oldvers + "/" + oldHeader[4][:-(len(oldvers) + 1 + 5)] + ".yang"
+			line = ' '.join(oldHeader)
+		if line.startswith("// new:"):
+			newHeader = line.split()
+			newHeader[2] = newvers + "/" + newHeader[2]
+			newHeader[4] = newvers + "/" + newHeader[4]
+			line = ' '.join(newHeader)
+			result.append(line)
+			break
+		result.append(line)
+		i += 1
+	return '\n'.join(result)
 
 # def create_yang_directories():
 # 	subprocess.run([
@@ -81,14 +97,14 @@ def getAndOrModifyFiles(vers, file, old):
 			if not filename_parsed:
 				filename_parsed = True
 				if old:
-					f.write(modify_line(line, vers)[0])
+					f.write(modifyLine(line, vers)[0])
 				else:
 					f.write(line)
 				continue
 			if line.find("import") != -1 or line.find("include") != -1 or line.find("belongs-to") != -1:
 				tab = len(line) - len(line.lstrip())
 				if old:
-					result = modify_line(line[tab:], vers)
+					result = modifyLine(line[tab:], vers)
 					file_list.append(result[1])
 					f.write(line[:tab] + result[0])
 				else:
@@ -102,19 +118,14 @@ def getAndOrModifyFiles(vers, file, old):
 		completed.add(cur)
 	return {"errors": []}
 
-def modify_line(line, vers):
+def modifyLine(line, vers):
 	words = line.split()
 	file_name = words[1]
 	words[1] = words[1] + "-" + vers
 	words.append('\n')
 	return [' '.join(words), file_name]
 
-def create_output_directory():
-	subpr = subprocess.run([
-		"mkdir",
-		"diff_output"])
-
-def check_for_valid_files(file, dir_name):
+def checkForValidFiles(file, dir_name):
 	subpr = subprocess.run([
 		"pyang", 
 		"-f", 
@@ -123,21 +134,31 @@ def check_for_valid_files(file, dir_name):
 		"-p",
 		dir_name], capture_output=True, text=True)
 	if subpr.stderr != "":
-		message = "Error(s) occurred - File set invalid"
+		print(subpr.stderr)
 		index = subpr.stderr.find("]")
 		if index != -1:
-			return {"errors": [message, (subpr.stderr[index + 2:]).strip('\n')]}
-		errors = subpr.stderr.splitlines()
-		for line in errors:
-			line = line[line.find("error: ") + 7:]
-			line = line[:1].upper() + line[1:]
-		errors[:0] = message
-		return {"errors": errors}
+			# this error should not occur. would be caught by getAndOrModifyFiles()
+			# occurs when file path given to pyang does not exist
+			return {"errors": ["File set invalid", (subpr.stderr[index + 2:]).strip('\n')], "warnings": []}
+		errors = []
+		warnings = []
+		for line in subpr.stderr.splitlines():
+			if line.find("error") != -1:
+				line = line[line.find("error: ") + 7:]
+				line = line[:1].upper() + line[1:]
+				errors.append(line)
+			else:
+				line = line[line.find("warning: ") + 9:]
+				line = line[:1].upper() + line[1:]
+				warnings.append(line)
+		return {"errors": errors, "warnings": warnings}
 	output = subpr.stdout.strip('\n')
 	if output == "":
+		# occurs when pyang returns nothing since node tree cannot be constructed
+		# occurs when file input is submodule or types file
 		return {"errors":  ["Please select a primary module to compare. You have selected a submodule or types file." +
-			"\nA node tree cannot be constructed from this file."]}
-	return {"errors": []}
+			"\nA node tree cannot be constructed from this file."], "warnings": []}
+	return {"errors": [], "warnings": []}
 
 def main():
 	emptyYangDirectories()
@@ -145,6 +166,11 @@ def main():
 	print(result)
 
 if __name__ == "__main__":
-	main()
+	# main()
+	list1 = []
+	list2 = [3,4,5]
+	list1 += list2
+	print(list1)
+
 	
 
