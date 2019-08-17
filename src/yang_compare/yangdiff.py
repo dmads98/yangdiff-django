@@ -1,24 +1,22 @@
 import subprocess
 import requests
 
-def fileCompare(oldvers, oldfile, newvers, newfile):
-	diff_type = "normal" #change to revision
-	header = "false"
-	warnings = []
+def fileCompare(oldvers, oldfile, newvers, newfile, difftype):
 	result = getAndOrModifyFiles(oldvers, oldfile, True)
 	if result['errors']:
-		return {"output": "", "errors": result["errors"]}
+		return {"output": "", "errors": result["errors"], "warnings": []}
 	result = getAndOrModifyFiles(newvers, newfile, False)
 	if result['errors']:
-		return {"output": "", "errors": result["errors"]}
+		return {"output": "", "errors": result["errors"], "warnings": []}
+	warnings = []
 	result = checkForValidFiles(oldfile[:-5] + "-" + oldvers, "yang_old")
 	if result['errors']:
-		return {"output": "", "errors": result["errors"]}
+		return {"output": "", "errors": result["errors"], "warnings": result['warnings']}
 	if result['warnings']:
 		warnings += result['warnings']
 	result = checkForValidFiles(newfile[:-5], "yang_new")
 	if result['errors']:
-		return {"output": "", "errors": result["errors"]}
+		return {"output": "", "errors": result["errors"], "warnings": result['warnings']}
 	if result['warnings']:
 		warnings += result['warnings']
 	subpr = subprocess.run([
@@ -26,10 +24,9 @@ def fileCompare(oldvers, oldfile, newvers, newfile):
 		"--old=yang_old/" + oldfile[:-5] + "-" + oldvers + ".yang",
 		"--new=yang_new/" + newfile,
 		"--modpath=" + "yang_old:yang_new",
-		"--difftype=" + diff_type,
-		"--header=" + header], capture_output=True, text=True)
+		"--difftype=" + difftype,
+		"--header=false"], capture_output=True, text=True)
 	output = subpr.stdout.strip('\n')
-	print(output)
 	errors = []
 	if output.startswith("Error"):
 		errors.append("Comparison Unsuccessful")
@@ -39,24 +36,25 @@ def cleanOutput(output, oldvers, newvers):
 	result = []
 	i = 0
 	lines = output.splitlines()
+	header_parsed = False
 	while i < len(lines):
 		line = lines[i]
-		if line.startswith("Warning: Module") and line.endswith("not used"):
-			# this warning will be taken care of through pyang
-			i += 3
-			continue
-		if line.startswith("// old:"):
-			oldHeader = line.split()
-			oldHeader[2] = oldvers + "/" + oldHeader[2][:-(len(oldvers) + 1)]
-			oldHeader[4] = oldvers + "/" + oldHeader[4][:-(len(oldvers) + 1 + 5)] + ".yang"
-			line = ' '.join(oldHeader)
-		if line.startswith("// new:"):
-			newHeader = line.split()
-			newHeader[2] = newvers + "/" + newHeader[2]
-			newHeader[4] = newvers + "/" + newHeader[4]
-			line = ' '.join(newHeader)
-			result.append(line)
-			break
+		if not header_parsed:
+			if line.startswith("Warning: Module") and line.endswith("not used"):
+				# this warning will be taken care of through pyang
+				i += 3
+				continue
+			if line.startswith("// old:"):
+				oldHeader = line.split()
+				oldHeader[2] = oldvers + "/" + oldHeader[2][:-(len(oldvers) + 1)]
+				oldHeader[4] = oldvers + "/" + oldHeader[4][:-(len(oldvers) + 1 + 5)] + ".yang"
+				line = ' '.join(oldHeader)
+			if line.startswith("// new:"):
+				newHeader = line.split()
+				newHeader[2] = newvers + "/" + newHeader[2]
+				newHeader[4] = newvers + "/" + newHeader[4]
+				line = ' '.join(newHeader)
+				header_parsed = True
 		result.append(line)
 		i += 1
 	return '\n'.join(result)
@@ -76,6 +74,7 @@ def emptyYangDirectories():
 def getAndOrModifyFiles(vers, file, old):
 	file_list = [file[:-5]]
 	completed = set()
+	primaryFileChecked = False
 	while file_list:
 		cur = file_list.pop()
 		if cur in completed:
@@ -88,6 +87,11 @@ def getAndOrModifyFiles(vers, file, old):
 		content = requests.get(url)
 		if (content.status_code == 404):
 			return {"errors": ["File Not Found: " + vers + "/" + cur + ".yang"]}
+		if not primaryFileChecked:
+			primaryFileChecked = True
+			if content.text.startswith("submodule"):
+					return {"errors":  ["Please select a primary module or types file to compare. You have selected a submodule." +
+				"\nA node tree cannot be constructed from this file."]}
 		header_parsed = False
 		filename_parsed = False
 		for line in content.text.splitlines(True):
@@ -152,12 +156,6 @@ def checkForValidFiles(file, dir_name):
 				line = line[:1].upper() + line[1:]
 				warnings.append(line)
 		return {"errors": errors, "warnings": warnings}
-	output = subpr.stdout.strip('\n')
-	if output == "":
-		# occurs when pyang returns nothing since node tree cannot be constructed
-		# occurs when file input is submodule or types file
-		return {"errors":  ["Please select a primary module to compare. You have selected a submodule or types file." +
-			"\nA node tree cannot be constructed from this file."], "warnings": []}
 	return {"errors": [], "warnings": []}
 
 def main():

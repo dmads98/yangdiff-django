@@ -54,11 +54,12 @@ def getFileContent(request, vers, file):
 		return JsonResponse({"success": True, "content": content_req.text}, status=200)
 	return JsonResponse({"success": False}, status=400)
 
-def compareFiles(request, oldvers, oldfile, newvers, newfile):
+def compareFiles(request, oldvers, oldfile, newvers, newfile, difftype):
 	if request.method == "GET" and request.is_ajax():
-		result = fileCompare(oldvers, oldfile, newvers, newfile)
+		result = fileCompare(oldvers, oldfile, newvers, newfile, difftype)
 		emptyYangDirectories()
 		return JsonResponse({"success": True, "diff": result["output"], "errors": result["errors"], "warnings": result["warnings"]}, status=200)
 	return JsonResponse({"success": False}, status=400)
+
 
 

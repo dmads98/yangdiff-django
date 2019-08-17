@@ -22,7 +22,8 @@ var findDiff = function(){
 		$('#version-dropdown1').dropdown('get value') + '/' +
 		$('#file-dropdown1').dropdown('get value') + '/' +
 		$('#version-dropdown2').dropdown('get value') + '/' +
-		$('#file-dropdown2').dropdown('get value');
+		$('#file-dropdown2').dropdown('get value') + '/' + 
+		$('#difftype').dropdown('get value');
     $.ajax({
     	url: url,
     	type: 'GET',
@@ -81,16 +82,6 @@ function handleModal(id){
 var inputChanged = false;
 
 $(document).ready(() => {
-	$("#versions-button").on('click', () => {
-		$("#versions").toggle()
-		var content = $('#versions-button').html()
-		if (content == "Show XR Versions"){
-			$('#versions-button').html("Hide XR Versions")
-		}
-		else{
-			$('#versions-button').html("Show XR Versions")
-		}
-	});
 	$('#start-btn').on('click', (e) => { 
 		$('html, body').animate({
       		scrollTop: $($(e.currentTarget).attr('href')).outerHeight() - 
@@ -101,6 +92,8 @@ $(document).ready(() => {
     	'linear'
   		)
 	});
+	$('#difftype').dropdown();
+
 	$('#version-dropdown1').dropdown({
 		forceSelection: false,
 		clearable: true,

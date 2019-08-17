@@ -60,7 +60,7 @@ Yang File Compare
   </div>
 </div>
 
-<hr>
+<div class="ui divider"></div>
 
 <div id="version-dropdown2" class="ui new search selection dropdown floating button">
   <input id="version-value2" type="hidden" name="version">
@@ -103,6 +103,17 @@ Yang File Compare
   Compare Same File
 </button>
 
+<div id="difftype" class="ui compact selection dropdown floating button">
+  <input type="hidden" name="difftype" value="revision">
+  <i class="dropdown icon"></i>
+  <div class="default text">Revision</div>
+  <div class="menu">
+    <div class="item" data-text="Output Type: Terse" data-value="terse">Terse</div>
+    <div class="item" data-text="Output Type: Normal" data-value="normal">Normal</div>
+    <div class="item" data-text="Output Type: Revision" data-value="revision">Revision</div>
+  </div>
+</div>
+
 <div id="files-missing-msg" class="ui compact warning diff message">
   <i class="close icon"></i>
   <div class="header">
@@ -136,7 +147,8 @@ Yang File Compare
 </div>
 
 <div id="diff">
-  <hr>
+  <div class="ui divider"></div>
+  <!-- <hr> -->
   <h2 class="ui top attached header">
     Module Comparison
   </h2>
