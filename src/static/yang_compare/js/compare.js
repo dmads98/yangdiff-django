@@ -20,9 +20,9 @@ var findDiff = function(){
 	$('#diff pre').empty()
 	url = 'ajax/findDiff/' + 
 		$('#version-dropdown1').dropdown('get value') + '/' +
-		$('#file-dropdown1').dropdown('get value') + '/' +
+		$('#module-dropdown1').dropdown('get value') + '/' +
 		$('#version-dropdown2').dropdown('get value') + '/' +
-		$('#file-dropdown2').dropdown('get value') + '/' + 
+		$('#module-dropdown2').dropdown('get value') + '/' + 
 		$('#difftype').dropdown('get value');
     $.ajax({
     	url: url,
@@ -49,7 +49,7 @@ var findDiff = function(){
     		}
     		$('#compare-btn').removeClass('loading')
     	},
-    	error : function(response){
+    	error: function(response){
 			console.log(response)
 		}
     });
@@ -59,15 +59,36 @@ var findDiff = function(){
 //   return new Promise(resolve => setTimeout(resolve, ms));
 // }
 
+function contentDownload(content, filename){
+	// Create an invisible A element
+	const $temp = $("<a>", {id: "download-temp"});
+	$temp.hide()
+	$('body').append($temp);
+
+	// Set the HREF to a Blob representation of the data to be downloaded
+	$("#download-temp").attr("href", window.URL.createObjectURL(new Blob([content], {type: "text/plain"})));
+
+	// Use download attribute to set desired file name
+	$("#download-temp").attr("download", filename);
+
+	// Trigger the download by simulating click
+	// Cannot simulate click on jquery anchor element for security reasons
+	document.getElementById('download-temp').click();
+
+	// Cleanup
+	window.URL.revokeObjectURL($("#download-temp").attr("href"));
+	$("#download-temp").remove();
+}
+
 function handleModal(id){
-	if ($('#file-view' + id + ' pre').html() == ""){
-		var url = '/compare/ajax/view/' + $('#version-dropdown' + id).dropdown('get value') + '/' + $('#file-dropdown' + id).dropdown('get value');
+	if ($('#module-view' + id + ' pre').html() == ""){
+		var url = '/compare/ajax/view/' + $('#version-dropdown' + id).dropdown('get value') + '/' + $('#module-dropdown' + id).dropdown('get value');
 		$.ajax({
 	    	url: url,
 	    	type: 'GET',
 	    	success: function(response){
-	    		$('#file-view' + id + ' pre').append(response.content)
-	    		$('#file-view' + id).modal('show')
+	    		$('#module-view' + id + ' pre').append(response.content)
+	    		$('#module-view' + id).modal('show')
 	    	},
 	    	error : function(response){
 				console.log(response)
@@ -75,7 +96,7 @@ function handleModal(id){
     	});
 	}
 	else{
-		$('#file-view' + id).modal('show')
+		$('#module-view' + id).modal('show')
 	}
 }
 
@@ -107,15 +128,15 @@ $(document).ready(() => {
 	});
 
 	$('#version-value1').on('change', () => {
-		$('#file-dropdown1 .menu').empty()
-		$('#file-dropdown1').dropdown('clear')
+		$('#module-dropdown1 .menu').empty()
+		$('#module-dropdown1').dropdown('clear')
 		if($('#version-dropdown1').dropdown('get value') == ""){
-			$('#file-dropdown1').addClass('disabled')
+			$('#module-dropdown1').addClass('disabled')
 		}
 		else{
 			var url = '/compare/ajax/files/' + $('#version-dropdown1').dropdown('get value');
-			$('#file-dropdown1').removeClass('disabled')
-			$('#file-dropdown1').dropdown({
+			$('#module-dropdown1').removeClass('disabled')
+			$('#module-dropdown1').dropdown({
 				forceSelection: false,
 				clearable: true,
 		      	filterRemoteData: true,
@@ -129,13 +150,13 @@ $(document).ready(() => {
 		}
 	})
 
-	$('#file-dropdown1').on('change', () => {
-		$('#file-view1 pre').empty()
-		if ($('#file-dropdown1').dropdown('get value') != ""){
-			$('#view-file-btn1').removeClass('disabled')
+	$('#module-dropdown1').on('change', () => {
+		$('#module-view1 pre').empty()
+		if ($('#module-dropdown1').dropdown('get value') != ""){
+			$('#view-module-btn1').removeClass('disabled')
 		}
 		else{
-			$('#view-file-btn1').addClass('disabled')
+			$('#view-module-btn1').addClass('disabled')
 		}
 	})
 
@@ -152,15 +173,15 @@ $(document).ready(() => {
 	});
 
 	$('#version-value2').on('change', () => {
-		$('#file-dropdown2 .menu').empty()
-		$('#file-dropdown2').dropdown('clear')
+		$('#module-dropdown2 .menu').empty()
+		$('#module-dropdown2').dropdown('clear')
 		if($('#version-dropdown2').dropdown('get value') == ""){
-			$('#file-dropdown2').addClass('disabled')
+			$('#module-dropdown2').addClass('disabled')
 		}
 		else{
 			var url = '/compare/ajax/files/' + $('#version-dropdown2').dropdown('get value');
-			$('#file-dropdown2').removeClass('disabled')
-			$('#file-dropdown2').dropdown({
+			$('#module-dropdown2').removeClass('disabled')
+			$('#module-dropdown2').dropdown({
 				forceSelection: false,
 				clearable: true,
 		      	filterRemoteData: true,
@@ -174,26 +195,26 @@ $(document).ready(() => {
 		}
 	})
 
-	$('#file-dropdown2').on('change', () => {
-		$('#file-view2 pre').empty()
-		if ($('#file-dropdown2').dropdown('get value') != ""){
-			$('#view-file-btn2').removeClass('disabled')
+	$('#module-dropdown2').on('change', () => {
+		$('#module-view2 pre').empty()
+		if ($('#module-dropdown2').dropdown('get value') != ""){
+			$('#view-module-btn2').removeClass('disabled')
 		}
 		else{
-			$('#view-file-btn2').addClass('disabled')
+			$('#view-module-btn2').addClass('disabled')
 		}
 	})
 
 	$('#compare-btn').on('click', () => {
 		if (($('#version-dropdown1').dropdown('get value') == "") ||
 				($('#version-dropdown2').dropdown('get value') == "") ||
-				($('#file-dropdown1').dropdown('get value') == "") ||
-				($('#file-dropdown2').dropdown('get value') == "")){
-			$('#files-missing-msg').show()
+				($('#module-dropdown1').dropdown('get value') == "") ||
+				($('#module-dropdown2').dropdown('get value') == "")){
+			$('#module-missing-msg').show()
 		}
 		else if (($('#version-dropdown1').dropdown('get value') == $('#version-dropdown2').dropdown('get value')) &&
-				($('#file-dropdown1').dropdown('get value') == $('#file-dropdown2').dropdown('get value'))) {
-			$('#same-file-msg').show()
+				($('#module-dropdown1').dropdown('get value') == $('#module-dropdown2').dropdown('get value'))) {
+			$('#same-module-msg').show()
 		}
 		else if (inputChanged) {
 			inputChanged = false;
@@ -203,28 +224,12 @@ $(document).ready(() => {
 	})
 
 	$('#download-btn').on('click', () => {
-		// Create an invisible A element
-		const $temp = $("<a>", {id: "download-temp"});
-		$temp.hide()
-		$('body').append($temp);
-
-		// Set the HREF to a Blob representation of the data to be downloaded
-		$("#download-temp").attr("href", window.URL.createObjectURL(new Blob([$('#diff pre').html()], {type: "text/plain"})));
-
-		// Use download attribute to set desired file name
+		let content = $('#diff pre').html();
 		let filename = $('#version-dropdown1').dropdown('get text') + "_" + 
-			$('#file-dropdown1').dropdown('get text') + "_" + 
+			$('#module-dropdown1').dropdown('get text') + "_" + 
 			$('#version-dropdown2').dropdown('get text') + "_" + 
-			$('#file-dropdown2').dropdown('get text') + "_diff" + ".txt"
-		$("#download-temp").attr("download", filename);
-
-		// Trigger the download by simulating click
-		// Can simulate click on jquery anchor element for security reasons
-		document.getElementById('download-temp').click();
-
-		// Cleanup
-		window.URL.revokeObjectURL($("#download-temp").attr("href"));
-		$("#download-temp").remove();
+			$('#module-dropdown2').dropdown('get text') + "_diff" + ".txt"
+		contentDownload(content, filename)
 	})
 
 	$('.ui.dropdown').on('change', () => {
@@ -239,20 +244,34 @@ $(document).ready(() => {
 	$('#clear-btn').on('click', () => {
 		$('#version-dropdown1').dropdown('clear')
 		$('#version-dropdown2').dropdown('clear')
-		$('#file-dropdown1').dropdown('clear')
-		$('#file-dropdown2').dropdown('clear')
+		$('#module-dropdown1').dropdown('clear')
+		$('#module-dropdown2').dropdown('clear')
 	})
 
-	// $('#same-file-btn').on('click', () => {
+	$('#different-module-btn').on('click', () => {
+		console.log("test test")
+	})
 
-	// })
-
-	$('#view-file-btn1').on('click', () => {
+	$('#view-module-btn1').on('click', () => {
 		handleModal(1)
 	})
 
-	$('#view-file-btn2').on('click', () => {
+	$('#modal1-download-btn').on('click', () => {
+		let content = $('#module-view1 pre').html();
+		let filename = $('#version-dropdown1').dropdown('get text') + "_" + 
+			$('#module-dropdown1').dropdown('get text') + ".yang"
+		contentDownload(content, filename)
+	})
+
+	$('#view-module-btn2').on('click', () => {
 		handleModal(2)
+	})
+
+	$('#modal2-download-btn').on('click', () => {
+		let content = $('#module-view2 pre').html();
+		let filename = $('#version-dropdown2').dropdown('get text') + "_" + 
+			$('#module-dropdown2').dropdown('get text') + ".yang"
+		contentDownload(content, filename)
 	})
 	
 })

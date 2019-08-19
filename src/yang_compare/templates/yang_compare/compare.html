@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block head_title %}
-Yang File Compare
+Yang Module Compare
 {% endblock %}
 
 {% block content %}
@@ -27,7 +27,7 @@ Yang File Compare
 
 </div>
 
-<h1 id="select-title">Select Files to Compare:</h1>
+<h1 id="select-title">Select Modules to Compare:</h1>
 <hr>
 
 
@@ -37,22 +37,26 @@ Yang File Compare
   <div class="default text">Select XR Version</div>
 </div>
 
-<div id="file-dropdown1" class="ui old disabled search selection dropdown floating button">
-  <input type="hidden" name="file">
+<div id="module-dropdown1" class="ui old disabled search selection dropdown floating button">
+  <input type="hidden" name="module">
   <i class="dropdown icon"></i>
-  <div class="default text">Select Yang File</div>
+  <div class="default text">Select Yang Module</div>
 </div>
 
-<button id="view-file-btn1" class="disabled ui button">
-  View File
+<button id="view-module-btn1" class="disabled ui button">
+  View Module
 </button>
 
-<div id="file-view1" class="ui modal">
-  <div class="header">File Content</div>
+<div id="module-view1" class="ui modal">
+  <div class="header">Module Content</div>
   <div class="scrolling content">
     <pre></pre>
   </div>
   <div class="actions">
+    <button id="modal1-download-btn" class="ui primary right labeled icon button">
+      <i class="download icon"></i>
+      Download
+    </button>
     <div class="ui primary approve right labeled icon button">
       Continue
       <i class="checkmark icon"></i>
@@ -68,22 +72,26 @@ Yang File Compare
   <div class="default text">Select XR Version</div>
 </div>
 
-<div id="file-dropdown2" class="ui new disabled search selection dropdown floating button">
-  <input type="hidden" name="file">
+<div id="module-dropdown2" class="ui new disabled search selection dropdown floating button">
+  <input type="hidden" name="module">
   <i class="dropdown icon"></i>
-  <div class="default text">Select Yang File</div>
+  <div class="default text">Select Yang Module</div>
 </div>
 
-<button id="view-file-btn2" class="disabled ui button">
-  View File
+<button id="view-module-btn2" class="disabled ui button">
+  View Module
 </button>
 
-<div id="file-view2" class="ui modal">
-  <div class="header">File Content</div>
+<div id="module-view2" class="ui modal">
+  <div class="header">Module Content</div>
   <div class="scrolling content">
     <pre></pre>
   </div>
   <div class="actions">
+    <button id="modal2-download-btn" class="ui primary right labeled icon button">
+      <i class="download icon"></i>
+      Download
+    </button>
     <div class="ui primary approve right labeled icon button">
       Continue
       <i class="checkmark icon"></i>
@@ -99,8 +107,8 @@ Yang File Compare
   Clear All
 </button>
 
-<button id="same-file-btn" class="ui button">
-  Compare Same File
+<button id="different-module-btn" class="ui button">
+  Compare Different Modules
 </button>
 
 <div id="difftype" class="ui compact selection dropdown floating button">
@@ -114,20 +122,20 @@ Yang File Compare
   </div>
 </div>
 
-<div id="files-missing-msg" class="ui compact warning diff message">
+<div id="module-missing-msg" class="ui compact warning diff message">
   <i class="close icon"></i>
   <div class="header">
-     Please select files to compare.
+     Please select modules to compare.
   </div>
-  Two files must be chosen.
+  Two modules must be chosen.
 </div>
 
-<div id="same-file-msg" class="ui compact warning diff message">
+<div id="same-module-msg" class="ui compact warning diff message">
   <i class="close icon"></i>
   <div class="header">
-    Please select unique files.
+    Please select unique modules.
   </div>
-  The same file has been chosen twice.
+  The same module has been chosen twice.
 </div>
 
 <div id="error-msg" class="ui compact negative diff message">
