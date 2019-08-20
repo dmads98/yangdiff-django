@@ -15,16 +15,28 @@
 //     });
 // };
 
-var findDiff = function(){
+var moduleCompare = function(){
 	$('#compare-btn').addClass('loading')
 	$('#diff pre').empty()
-	url = 'ajax/findDiff/' + 
+	let url = 'ajax/findDiff/' + 
 		$('#version-dropdown1').dropdown('get value') + '/' +
 		$('#module-dropdown1').dropdown('get value') + '/' +
-		$('#version-dropdown2').dropdown('get value') + '/' +
-		$('#module-dropdown2').dropdown('get value') + '/' + 
-		$('#difftype').dropdown('get value');
-    $.ajax({
+		$('#version-dropdown2').dropdown('get value') + '/'
+	if ($('#module-dropdown2').is(':hidden')){
+		url += $('#module-dropdown1').dropdown('get value') + '/' + 
+				$('#difftype').dropdown('get value');
+		console.log("test")
+		checkFileExistsAndDiff($('#version-dropdown2').dropdown('get value'), $('#module-dropdown1').dropdown('get value'), url)
+	}
+	else{
+		url += $('#module-dropdown2').dropdown('get value') + '/' + 
+			$('#difftype').dropdown('get value');
+		findDiff(url)
+	}
+};
+
+function findDiff(url){
+	$.ajax({
     	url: url,
     	type: 'GET',
     	success: function(response){
@@ -34,7 +46,7 @@ var findDiff = function(){
     			response.errors.forEach(function(element) {
     				$('#error-msg pre').append(element + "\n")
 				});
-    			$('#error-msg').show()
+    			$('#error-msg').css('display', 'inline-block');
     		}
     		else{
     			if (response.warnings.length != 0){
@@ -42,10 +54,10 @@ var findDiff = function(){
 	    			response.warnings.forEach(function(element) {
 	    				$('#post-diff-warning pre').append(element + "\n")
 					});
-	    			$('#post-diff-warning').show()
+	    			$('#post-diff-warning').css('display', 'inline-block');
     			}		
     			$('#diff pre').append(response.diff)
-    			$('#diff').show()
+    			$('#diff').css('display', 'inline-block');
     		}
     		$('#compare-btn').removeClass('loading')
     	},
@@ -53,7 +65,30 @@ var findDiff = function(){
 			console.log(response)
 		}
     });
-};
+}
+
+function checkFileExistsAndDiff(vers, file, url){
+	if ($('#no-module-msg pre').html() == ""){
+		$.ajax({
+	    	url: '/compare/ajax/view/' + vers + '/' + file,
+	    	type: 'GET',
+	    	success: function(response){
+	    		findDiff(url)
+	    	},
+	    	error : function(response){
+				let message = "The " + $('#module-dropdown1').dropdown('get value') + " module does not exist in the " 
+					+ $('#version-dropdown2').dropdown('get value') + " release.\nPlease make another selection."
+				$('#no-module-msg pre').append(message)
+				$('#no-module-msg').css('display', 'inline-block');
+				$('#compare-btn').removeClass('loading')
+			}
+		});
+	}
+	else{
+		$('#no-module-msg').css('display', 'inline-block');
+		$('#compare-btn').removeClass('loading')
+	}
+}
 
 // function sleep(ms) {
 //   return new Promise(resolve => setTimeout(resolve, ms));
@@ -82,18 +117,39 @@ function contentDownload(content, filename){
 
 function handleModal(id){
 	if ($('#module-view' + id + ' pre').html() == ""){
-		var url = '/compare/ajax/view/' + $('#version-dropdown' + id).dropdown('get value') + '/' + $('#module-dropdown' + id).dropdown('get value');
-		$.ajax({
-	    	url: url,
-	    	type: 'GET',
-	    	success: function(response){
-	    		$('#module-view' + id + ' pre').append(response.content)
-	    		$('#module-view' + id).modal('show')
-	    	},
-	    	error : function(response){
-				console.log(response)
+		if ($('#no-module-msg pre').html() == ""){
+			var url = '/compare/ajax/view/'
+			if (id == 2){
+				if ($('#module-dropdown2').is(':hidden')){
+					url += $('#version-dropdown2').dropdown('get value') + '/' + $('#module-dropdown1').dropdown('get value');
+				}
+				else{
+					url += $('#version-dropdown2').dropdown('get value') + '/' + $('#module-dropdown2').dropdown('get value');
+				}
 			}
-    	});
+			else{
+				url += $('#version-dropdown1').dropdown('get value') + '/' + $('#module-dropdown1').dropdown('get value');
+			}
+			$.ajax({
+		    	url: url,
+		    	type: 'GET',
+		    	success: function(response){
+		    		console.log(response)
+		    		$('#module-view' + id + ' pre').append(response.content)
+		    		$('#module-view' + id).modal('show')
+		    	},
+		    	error: function(response){
+					console.log(response)
+					let message = "The " + response.responseJSON.file + " module does not exist in the " + response.responseJSON.version + 
+						" release.\nPlease make another selection."
+					$('#no-module-msg pre').append(message)
+					$('#no-module-msg').css('display', 'inline-block');
+				}
+	    	});
+		}
+		else{
+			$('#no-module-msg').css('display', 'inline-block');
+		}
 	}
 	else{
 		$('#module-view' + id).modal('show')
@@ -103,6 +159,8 @@ function handleModal(id){
 var inputChanged = false;
 
 $(document).ready(() => {
+	
+	//get-started button
 	$('#start-btn').on('click', (e) => { 
 		$('html, body').animate({
       		scrollTop: $($(e.currentTarget).attr('href')).outerHeight() - 
@@ -113,6 +171,8 @@ $(document).ready(() => {
     	'linear'
   		)
 	});
+
+	//output-type dropdown initialization
 	$('#difftype').dropdown();
 
 	$('#version-dropdown1').dropdown({
@@ -127,7 +187,7 @@ $(document).ready(() => {
     	},
 	});
 
-	$('#version-value1').on('change', () => {
+	$('#version-dropdown1').on('change', () => {
 		$('#module-dropdown1 .menu').empty()
 		$('#module-dropdown1').dropdown('clear')
 		if($('#version-dropdown1').dropdown('get value') == ""){
@@ -172,26 +232,37 @@ $(document).ready(() => {
     	},
 	});
 
-	$('#version-value2').on('change', () => {
-		$('#module-dropdown2 .menu').empty()
-		$('#module-dropdown2').dropdown('clear')
-		if($('#version-dropdown2').dropdown('get value') == ""){
-			$('#module-dropdown2').addClass('disabled')
+	$('#version-dropdown2').on('change', () => {
+		if (!$('#module-dropdown2').is(':hidden')){
+			$('#module-dropdown2 .menu').empty()
+			$('#module-dropdown2').dropdown('clear')
+			if($('#version-dropdown2').dropdown('get value') == ""){
+				$('#module-dropdown2').addClass('disabled')
+			}
+			else{
+				var url = '/compare/ajax/files/' + $('#version-dropdown2').dropdown('get value');
+				$('#module-dropdown2').removeClass('disabled')
+				$('#module-dropdown2').dropdown({
+					forceSelection: false,
+					clearable: true,
+			      	filterRemoteData: true,
+			      	saveRemoteData: false,
+					apiSettings: {
+			      		// this url parses query server side and returns filtered results
+			      		url: url,
+			      		cache: false,
+			    	},
+				});
+			}
 		}
 		else{
-			var url = '/compare/ajax/files/' + $('#version-dropdown2').dropdown('get value');
-			$('#module-dropdown2').removeClass('disabled')
-			$('#module-dropdown2').dropdown({
-				forceSelection: false,
-				clearable: true,
-		      	filterRemoteData: true,
-		      	saveRemoteData: false,
-				apiSettings: {
-		      		// this url parses query server side and returns filtered results
-		      		url: url,
-		      		cache: false,
-		    	},
-			});
+			$('#module-view2 pre').empty()
+			if ($('#version-dropdown2').dropdown('get value') == ""){
+				$('#view-module-btn2').addClass('disabled')
+			}
+			else{
+				$('#view-module-btn2').removeClass('disabled')
+			}
 		}
 	})
 
@@ -208,18 +279,21 @@ $(document).ready(() => {
 	$('#compare-btn').on('click', () => {
 		if (($('#version-dropdown1').dropdown('get value') == "") ||
 				($('#version-dropdown2').dropdown('get value') == "") ||
-				($('#module-dropdown1').dropdown('get value') == "") ||
-				($('#module-dropdown2').dropdown('get value') == "")){
-			$('#module-missing-msg').show()
+				($('#module-dropdown1').dropdown('get value') == "") || 
+				(!$('#module-dropdown2').is(':hidden') && ($('#module-dropdown2').dropdown('get value') == ""))){
+			$('#module-missing-msg').css('display', 'inline-block');
 		}
 		else if (($('#version-dropdown1').dropdown('get value') == $('#version-dropdown2').dropdown('get value')) &&
-				($('#module-dropdown1').dropdown('get value') == $('#module-dropdown2').dropdown('get value'))) {
-			$('#same-module-msg').show()
+				($('#module-dropdown2').is(':hidden') || ($('#module-dropdown1').dropdown('get value') == $('#module-dropdown2').dropdown('get value')))) {
+			$('#same-module-msg').css('display', 'inline-block');
+		}
+		else if ($('#no-module-msg pre').html() != ""){
+			$('#no-module-msg').css('display', 'inline-block');
 		}
 		else if (inputChanged) {
 			inputChanged = false;
 			$('#diff').hide()
-			findDiff()
+			moduleCompare()
 		}
 	})
 
@@ -235,6 +309,7 @@ $(document).ready(() => {
 	$('.ui.dropdown').on('change', () => {
 		inputChanged = true;
 		$('.ui.diff.message').hide()
+		$('#no-module-msg pre').empty()
 	})
 
 	$('.ui.diff.message .icon').on('click', () => {
@@ -249,7 +324,14 @@ $(document).ready(() => {
 	})
 
 	$('#different-module-btn').on('click', () => {
-		console.log("test test")
+		if ($('#different-module-btn').html() == "Compare Different Modules"){
+			$('#different-module-btn').html("Compare Same Module")
+			$('#module-dropdown2').css('display', 'inline-block');
+		}
+		else{
+			$('#different-module-btn').html( "Compare Different Modules")
+			$('#module-dropdown2').hide()
+		}
 	})
 
 	$('#view-module-btn1').on('click', () => {

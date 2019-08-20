@@ -1,9 +1,9 @@
-#placeholder {
-  margin: 10em 5em;
+#diff-input .ui.button, #diff-input .ui.dropdown{
+  margin: 4em 3em;
 }
 
 #version-dropdown1, #version-dropdown2{
-  margin: 10em 5em;
+  /*margin: 5em 5em;*/
   /*max-width: 400px;*/
 }
 
@@ -15,11 +15,11 @@
   font-family: Lato,'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
 
-.ui.diff.message{
+#module-dropdown2{
   display: none;
 }
 
-#diff{
+.ui.diff.message, #diff{
   display: none;
 }
 

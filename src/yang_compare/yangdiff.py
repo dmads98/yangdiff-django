@@ -59,13 +59,13 @@ def cleanOutput(output, oldvers, newvers):
 		i += 1
 	return '\n'.join(result)
 
-# def create_yang_directories():
-# 	subprocess.run([
-# 		"mkdir",
-# 		"yang_old"])
-# 	subprocess.run([
-# 		"mkdir",
-# 		"yang_new"])
+def createYangDirectories():
+	subprocess.run([
+		"mkdir",
+		"yang_old"])
+	subprocess.run([
+		"mkdir",
+		"yang_new"])
 
 def emptyYangDirectories():
 	subprocess.call("rm -r yang_old/*", shell=True)
@@ -137,6 +137,7 @@ def checkForValidFiles(file, dir_name):
 		dir_name + "/" + file + ".yang",  
 		"-p",
 		dir_name], capture_output=True, text=True)
+	print(subpr.stdout)
 	if subpr.stderr != "":
 		print(subpr.stderr)
 		index = subpr.stderr.find("]")
@@ -159,16 +160,23 @@ def checkForValidFiles(file, dir_name):
 	return {"errors": [], "warnings": []}
 
 def main():
-	emptyYangDirectories()
-	result = fileCompare("600", "Cisco-IOS-XR-Ethernet-SPAN-cfg.yang", "602", "Cisco-IOS-XR-Ethernet-SPAN-cfg.yang")
-	print(result)
+	# emptyYangDirectories()
+	createYangDirectories()
+	result = fileCompare("633", "Cisco-IOS-XR-telemetry-model-driven-oper.yang", 
+		"652", "Cisco-IOS-XR-telemetry-model-driven-oper.yang", "revision")
+	print(result["output"])
 
 if __name__ == "__main__":
-	# main()
-	list1 = []
-	list2 = [3,4,5]
-	list1 += list2
-	print(list1)
+	main()
+	# subpr = subprocess.run([
+	# 	"yangdiff-pro",
+	# 	"--old=yang_old/Cisco-IOS-XR-telemetry-model-driven-oper-633.yang",
+	# 	"--new=yang_new/Cisco-IOS-XR-telemetry-model-driven-oper.yang",
+	# 	"--modpath=" + "yang_old:yang_new",
+	# 	"--difftype=revision",
+	# 	"--header=false"], capture_output=True, text=True)
+	# output = subpr.stdout.strip('\n')
+	# print(output)
 
 	
 

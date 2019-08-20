@@ -30,95 +30,90 @@ Yang Module Compare
 <h1 id="select-title">Select Modules to Compare:</h1>
 <hr>
 
-
-<div id="version-dropdown1" class="ui old search selection dropdown floating button">
-  <input id="version-value1" type="hidden" name="version">
-  <i class="dropdown icon"></i>
-  <div class="default text">Select XR Version</div>
-</div>
-
-<div id="module-dropdown1" class="ui old disabled search selection dropdown floating button">
-  <input type="hidden" name="module">
-  <i class="dropdown icon"></i>
-  <div class="default text">Select Yang Module</div>
-</div>
-
-<button id="view-module-btn1" class="disabled ui button">
-  View Module
-</button>
-
-<div id="module-view1" class="ui modal">
-  <div class="header">Module Content</div>
-  <div class="scrolling content">
-    <pre></pre>
+<div id="diff-input">
+  <div id="version-dropdown1" class="ui old search selection dropdown floating button">
+    <input id="version-value1" type="hidden" name="version">
+    <i class="dropdown icon"></i>
+    <div class="default text">Select Old XR Version</div>
   </div>
-  <div class="actions">
-    <button id="modal1-download-btn" class="ui primary right labeled icon button">
-      <i class="download icon"></i>
-      Download
-    </button>
-    <div class="ui primary approve right labeled icon button">
-      Continue
-      <i class="checkmark icon"></i>
+
+  <div id="module-dropdown1" class="ui old disabled search selection dropdown floating button">
+    <input type="hidden" name="module">
+    <i class="dropdown icon"></i>
+    <div class="default text">Select Yang Module</div>
   </div>
+
+  <button id="view-module-btn1" class="disabled ui button">
+    View Old Module
+  </button>
+
+  <div id="module-view1" class="ui modal">
+    <div class="header">Module Content</div>
+    <div class="scrolling content">
+      <pre></pre>
+    </div>
+    <div class="actions">
+      <button id="modal1-download-btn" class="ui primary right labeled icon button">
+        <i class="download icon"></i>
+        Download
+      </button>
+      <div class="ui primary approve right labeled icon button">
+        Continue
+        <i class="checkmark icon"></i>
+    </div>
+    </div>
   </div>
-</div>
 
-<div class="ui divider"></div>
+  <div class="ui divider"></div>
 
-<div id="version-dropdown2" class="ui new search selection dropdown floating button">
-  <input id="version-value2" type="hidden" name="version">
-  <i class="dropdown icon"></i>
-  <div class="default text">Select XR Version</div>
-</div>
-
-<div id="module-dropdown2" class="ui new disabled search selection dropdown floating button">
-  <input type="hidden" name="module">
-  <i class="dropdown icon"></i>
-  <div class="default text">Select Yang Module</div>
-</div>
-
-<button id="view-module-btn2" class="disabled ui button">
-  View Module
-</button>
-
-<div id="module-view2" class="ui modal">
-  <div class="header">Module Content</div>
-  <div class="scrolling content">
-    <pre></pre>
+  <div id="version-dropdown2" class="ui new search selection dropdown floating button">
+    <input id="version-value2" type="hidden" name="version">
+    <i class="dropdown icon"></i>
+    <div class="default text">Select New XR Version</div>
   </div>
-  <div class="actions">
-    <button id="modal2-download-btn" class="ui primary right labeled icon button">
-      <i class="download icon"></i>
-      Download
-    </button>
-    <div class="ui primary approve right labeled icon button">
-      Continue
-      <i class="checkmark icon"></i>
+
+  <div id="module-dropdown2" class="ui new disabled search selection dropdown floating button">
+    <input type="hidden" name="module">
+    <i class="dropdown icon"></i>
+    <div class="default text">Select Yang Module</div>
   </div>
+
+  <button id="view-module-btn2" class="disabled ui button">View New Module</button>
+
+  <div id="module-view2" class="ui modal">
+    <div class="header">Module Content</div>
+    <div class="scrolling content">
+      <pre></pre>
+    </div>
+    <div class="actions">
+      <button id="modal2-download-btn" class="ui primary right labeled icon button">
+        <i class="download icon"></i>
+        Download
+      </button>
+      <div class="ui primary approve right labeled icon button">
+        Continue
+        <i class="checkmark icon"></i>
+    </div>
+    </div>
   </div>
-</div>
 
-<button id="compare-btn" class="ui huge teal button">
-  Find Diff
-</button>
+  <div class="ui divider"></div>
 
-<button id="clear-btn" class="ui button">
-  Clear All
-</button>
+  <button id="compare-btn" class="ui huge teal button">Find Diff</button>
 
-<button id="different-module-btn" class="ui button">
-  Compare Different Modules
-</button>
+  <button id="clear-btn" class="ui button">Clear All</button>
 
-<div id="difftype" class="ui compact selection dropdown floating button">
-  <input type="hidden" name="difftype" value="revision">
-  <i class="dropdown icon"></i>
-  <div class="default text">Revision</div>
-  <div class="menu">
-    <div class="item" data-text="Output Type: Terse" data-value="terse">Terse</div>
-    <div class="item" data-text="Output Type: Normal" data-value="normal">Normal</div>
-    <div class="item" data-text="Output Type: Revision" data-value="revision">Revision</div>
+  <button id="different-module-btn" class="ui button">Compare Different Modules</button>
+
+  <div id="difftype" class="ui compact selection dropdown floating button">
+    <input type="hidden" name="difftype" value="revision">
+    <i class="dropdown icon"></i>
+    <div class="default text">Revision</div>
+    <div class="menu">
+      <div class="item" data-text="Output Type: Terse" data-value="terse">Terse</div>
+      <div class="item" data-text="Output Type: Normal" data-value="normal">Normal</div>
+      <div class="item" data-text="Output Type: Revision" data-value="revision">Revision</div>
+    </div>
   </div>
 </div>
 
@@ -135,7 +130,15 @@ Yang Module Compare
   <div class="header">
     Please select unique modules.
   </div>
-  The same module has been chosen twice.
+  The same release and module has been chosen twice.
+</div>
+
+<div id="no-module-msg" class="ui compact negative diff message">
+  <i class="close icon"></i>
+  <div class="header">
+    Error Occured!
+  </div>
+  <pre></pre>
 </div>
 
 <div id="error-msg" class="ui compact negative diff message">
@@ -154,14 +157,14 @@ Yang Module Compare
   <pre></pre>
 </div>
 
+<!-- <div class="ui divider"></div> -->
+
 <div id="diff">
-  <div class="ui divider"></div>
-  <!-- <hr> -->
   <h2 class="ui top attached header">
     Module Comparison
   </h2>
   <div class="ui attached segment">
-    <pre>Test Test</pre>
+    <pre></pre>
   </div>
   <div class="ui bottom attached right aligned segment">
     <button id="download-btn" class="ui primary right labeled icon button">

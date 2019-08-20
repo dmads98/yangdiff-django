@@ -51,6 +51,8 @@ def getFileContent(request, vers, file):
 	if request.method == "GET" and request.is_ajax():
 		url = "https://raw.githubusercontent.com/YangModels/yang/master/vendor/cisco/xr/" + vers + "/" + file
 		content_req = requests.get(url)
+		if content_req.text.startswith("404"):
+			return JsonResponse({"success": False, "version": vers, "file": file}, status=400)
 		return JsonResponse({"success": True, "content": content_req.text}, status=200)
 	return JsonResponse({"success": False}, status=400)
 
