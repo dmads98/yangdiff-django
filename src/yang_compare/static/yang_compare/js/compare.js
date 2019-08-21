@@ -276,6 +276,43 @@ $(document).ready(() => {
 		}
 	})
 
+	$('#upload-button1').on('click', () => {
+		$('#file-input1').click()
+	})
+
+	$('#file-input1').on('change', () => {
+		$('#file-upload-select1').dropdown('clear')
+		let input = document.getElementById('file-input1')
+ 		$('#file-upload-select1 .menu').empty()
+	  	for (var i = 0; i < input.files.length; i++) {
+	  		let element = `<div class="item">` + input.files[i].name + `</div>`
+	    	$('#file-upload-select1 .menu').append(element);
+	    }
+	    $('#file-upload-select1').css('display', 'inline-block');
+	    $('#file-upload-select1').dropdown()
+  	});
+
+  	$('#upload-button2').on('click', () => {
+		$('#file-input2').click()
+	})
+
+	$('#file-input2').on('change', () => {
+		$('#file-upload-select2').dropdown('clear')
+		let input = document.getElementById('file-input2')
+ 		$('#file-upload-select2 .menu').empty()
+	  	for (var i = 0; i < input.files.length; i++) {
+	  		let element = `<div class="item">` + input.files[i].name + `</div>`
+	    	$('#file-upload-select2 .menu').append(element);
+	    }
+	    $('#file-upload-select2').css('display', 'inline-block');
+	    $('#file-upload-select2').dropdown()
+  	});
+
+  	$('.upload.input').on('change', () => {
+  		$('#version-dropdown1').dropdown('clear')
+		$('#version-dropdown2').dropdown('clear')
+  	})
+
 	$('#compare-btn').on('click', () => {
 		if (($('#version-dropdown1').dropdown('get value') == "") ||
 				($('#version-dropdown2').dropdown('get value') == "") ||
@@ -306,10 +343,18 @@ $(document).ready(() => {
 		contentDownload(content, filename)
 	})
 
-	$('.ui.dropdown').on('change', () => {
+	$('.ui.main.dropdown').on('change', () => {
 		inputChanged = true;
 		$('.ui.diff.message').hide()
 		$('#no-module-msg pre').empty()
+		if (($('#version-dropdown1').dropdown('get value') != "") ||
+				($('#version-dropdown2').dropdown('get value') != "") ||
+				($('#module-dropdown1').dropdown('get value') != "") || 
+				($('#module-dropdown2').dropdown('get value') != "")){
+			if ($('#show-upload-btn').html() == "Hide Upload Options"){
+				$('#show-upload-btn').click()
+			}
+		}
 	})
 
 	$('.ui.diff.message .icon').on('click', () => {
@@ -319,8 +364,8 @@ $(document).ready(() => {
 	$('#clear-btn').on('click', () => {
 		$('#version-dropdown1').dropdown('clear')
 		$('#version-dropdown2').dropdown('clear')
-		$('#module-dropdown1').dropdown('clear')
-		$('#module-dropdown2').dropdown('clear')
+		// $('#module-dropdown1').dropdown('clear')
+		// $('#module-dropdown2').dropdown('clear')
 	})
 
 	$('#different-module-btn').on('click', () => {
@@ -329,9 +374,21 @@ $(document).ready(() => {
 			$('#module-dropdown2').css('display', 'inline-block');
 		}
 		else{
-			$('#different-module-btn').html( "Compare Different Modules")
+			$('#different-module-btn').html("Compare Different Modules")
 			$('#module-dropdown2').hide()
 		}
+	})
+
+	$('#show-upload-btn').on('click', () => {
+		if ($('#show-upload-btn').html() == "Show Upload Options"){
+			$('#show-upload-btn').html("Hide Upload Options")
+		}
+		else{
+			$('.ui.upload.dropdown').hide()
+			$('.upload.input').val("")
+			$('#show-upload-btn').html("Show Upload Options");
+		}
+		$('#upload-section').toggle();
 	})
 
 	$('#view-module-btn1').on('click', () => {

@@ -168,15 +168,6 @@ def main():
 
 if __name__ == "__main__":
 	main()
-	# subpr = subprocess.run([
-	# 	"yangdiff-pro",
-	# 	"--old=yang_old/Cisco-IOS-XR-telemetry-model-driven-oper-633.yang",
-	# 	"--new=yang_new/Cisco-IOS-XR-telemetry-model-driven-oper.yang",
-	# 	"--modpath=" + "yang_old:yang_new",
-	# 	"--difftype=revision",
-	# 	"--header=false"], capture_output=True, text=True)
-	# output = subpr.stdout.strip('\n')
-	# print(output)
 
 	
 

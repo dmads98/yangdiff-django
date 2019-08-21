@@ -31,13 +31,13 @@ Yang Module Compare
 <hr>
 
 <div id="diff-input">
-  <div id="version-dropdown1" class="ui old search selection dropdown floating button">
+  <div id="version-dropdown1" class="ui old search selection main dropdown floating button">
     <input id="version-value1" type="hidden" name="version">
     <i class="dropdown icon"></i>
     <div class="default text">Select Old XR Version</div>
   </div>
 
-  <div id="module-dropdown1" class="ui old disabled search selection dropdown floating button">
+  <div id="module-dropdown1" class="ui old disabled search selection main dropdown floating button">
     <input type="hidden" name="module">
     <i class="dropdown icon"></i>
     <div class="default text">Select Yang Module</div>
@@ -66,13 +66,13 @@ Yang Module Compare
 
   <div class="ui divider"></div>
 
-  <div id="version-dropdown2" class="ui new search selection dropdown floating button">
+  <div id="version-dropdown2" class="ui new search selection main dropdown floating button">
     <input id="version-value2" type="hidden" name="version">
     <i class="dropdown icon"></i>
     <div class="default text">Select New XR Version</div>
   </div>
 
-  <div id="module-dropdown2" class="ui new disabled search selection dropdown floating button">
+  <div id="module-dropdown2" class="ui new disabled search selection main dropdown floating button">
     <input type="hidden" name="module">
     <i class="dropdown icon"></i>
     <div class="default text">Select Yang Module</div>
@@ -99,13 +99,37 @@ Yang Module Compare
 
   <div class="ui divider"></div>
 
+  <div id="upload-section">
+    <button id="upload-button1" class="ui right labeled icon button">
+      <i class="upload icon"></i>
+      Upload Old Modules
+    </button>
+    <input id='file-input1' type='file' class="upload input" multiple/>
+    <div id="file-upload-select1" class="ui compact selection upload dropdown floating button">
+      <input type="hidden" name="file-upload">
+      <i class="dropdown icon"></i>
+      <div class="default text">Select Primary Module</div>
+      <div class="menu">
+      </div>
+    </div>
+    <button id="upload-button2" class="ui right labeled icon button">
+      <i class="upload icon"></i>
+      Upload New Modules
+    </button>
+    <input id='file-input2' type='file' class="upload input" multiple/>
+    <div id="file-upload-select2" class="ui compact selection upload dropdown floating button">
+      <input type="hidden" name="file-upload">
+      <i class="dropdown icon"></i>
+      <div class="default text">Select Primary Module</div>
+      <div class="menu">
+      </div>
+    </div>
+    <div class="ui divider"></div>
+  </div>
+
   <button id="compare-btn" class="ui huge teal button">Find Diff</button>
 
-  <button id="clear-btn" class="ui button">Clear All</button>
-
-  <button id="different-module-btn" class="ui button">Compare Different Modules</button>
-
-  <div id="difftype" class="ui compact selection dropdown floating button">
+  <div id="difftype" class="ui compact selection main dropdown floating button">
     <input type="hidden" name="difftype" value="revision">
     <i class="dropdown icon"></i>
     <div class="default text">Revision</div>
@@ -115,6 +139,13 @@ Yang Module Compare
       <div class="item" data-text="Output Type: Revision" data-value="revision">Revision</div>
     </div>
   </div>
+
+  <button id="clear-btn" class="ui button">Clear All</button>
+
+  <button id="different-module-btn" class="ui button">Compare Different Modules</button>
+
+  <button id="show-upload-btn" class="ui button">Show Upload Options</button>
+
 </div>
 
 <div id="module-missing-msg" class="ui compact warning diff message">

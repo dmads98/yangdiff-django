@@ -15,7 +15,20 @@
   font-family: Lato,'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
 
+#upload-section input{
+  width: 1px;
+  height: 1px;
+}
+
 #module-dropdown2{
+  display: none;
+}
+
+#upload-section .ui.dropdown{
+  display: none;
+}
+
+#upload-section{
   display: none;
 }
 
