@@ -281,15 +281,21 @@ $(document).ready(() => {
 	})
 
 	$('#file-input1').on('change', () => {
-		$('#file-upload-select1').dropdown('clear')
 		let input = document.getElementById('file-input1')
- 		$('#file-upload-select1 .menu').empty()
-	  	for (var i = 0; i < input.files.length; i++) {
-	  		let element = `<div class="item">` + input.files[i].name + `</div>`
-	    	$('#file-upload-select1 .menu').append(element);
-	    }
-	    $('#file-upload-select1').css('display', 'inline-block');
-	    $('#file-upload-select1').dropdown()
+		if (input.files.length == 0){
+			$('#file-upload-select1').hide()
+			$('#file-upload-select1 .menu').empty()
+		}
+		else{
+			$('#file-upload-select1').dropdown('clear')
+	 		$('#file-upload-select1 .menu').empty()
+		  	for (var i = 0; i < input.files.length; i++) {
+		  		let element = `<div class="item">` + input.files[i].name + `</div>`
+		    	$('#file-upload-select1 .menu').append(element);
+		    }
+		    $('#file-upload-select1').css('display', 'inline-block');
+		    $('#file-upload-select1').dropdown()
+		}
   	});
 
   	$('#upload-button2').on('click', () => {
@@ -297,15 +303,21 @@ $(document).ready(() => {
 	})
 
 	$('#file-input2').on('change', () => {
-		$('#file-upload-select2').dropdown('clear')
 		let input = document.getElementById('file-input2')
- 		$('#file-upload-select2 .menu').empty()
-	  	for (var i = 0; i < input.files.length; i++) {
-	  		let element = `<div class="item">` + input.files[i].name + `</div>`
-	    	$('#file-upload-select2 .menu').append(element);
-	    }
-	    $('#file-upload-select2').css('display', 'inline-block');
-	    $('#file-upload-select2').dropdown()
+		if (input.files.length == 0){
+			$('#file-upload-select2').hide()
+			$('#file-upload-select2 .menu').empty()
+		}
+		else{
+			$('#file-upload-select2').dropdown('clear')
+	 		$('#file-upload-select2 .menu').empty()
+		  	for (var i = 0; i < input.files.length; i++) {
+		  		let element = `<div class="item">` + input.files[i].name + `</div>`
+		    	$('#file-upload-select2 .menu').append(element);
+		    }
+		    $('#file-upload-select2').css('display', 'inline-block');
+		    $('#file-upload-select2').dropdown()
+		}
   	});
 
   	$('.upload.input').on('change', () => {
@@ -313,10 +325,39 @@ $(document).ready(() => {
   		$('#version-dropdown1').dropdown('clear')
 		$('#version-dropdown2').dropdown('clear')
 		fileInputAdded = false
+		$('.ui.upload.message').hide()
+		$('.ui.upload.message pre').empty()
+  	})
+
+  	$('.upload.dropdown').on('change', () => {
+		$('#upload-module-msg').hide()
+		$('#upload-module-msg pre').empty()
   	})
 
 	$('#compare-btn').on('click', () => {
-		if (($('#version-dropdown1').dropdown('get value') == "") ||
+		let input1 = document.getElementById('file-input1')
+		let input2 = document.getElementById('file-input2')
+		let upload = false
+		if (input1.files.length > 0 || input2.files.length > 0){
+			upload = true
+			if (input1.files.length == 0){
+				$('#upload-missing-msg pre').append("The set of Old Modules is missing.")
+				$('#upload-missing-msg').css('display', 'inline-block');
+			}
+			else if (input2.files.length == 0){
+				$('#upload-missing-msg pre').append("The set of New Modules is missing.")
+				$('#upload-missing-msg').css('display', 'inline-block');
+			}
+			else if ($('#file-upload-select1').dropdown('get value') == ""){
+				$('#upload-module-msg pre').append("A primary module for the set of Old Modules has not been selected.")
+				$('#upload-module-msg').css('display', 'inline-block');
+			}
+			else if ($('#file-upload-select2').dropdown('get value') == ""){
+				$('#upload-module-msg pre').append("A primary module for the set of New Modules has not been selected.")
+				$('#upload-module-msg').css('display', 'inline-block');
+			}
+		}
+		else if (($('#version-dropdown1').dropdown('get value') == "") ||
 				($('#version-dropdown2').dropdown('get value') == "") ||
 				($('#module-dropdown1').dropdown('get value') == "") || 
 				(!$('#module-dropdown2').is(':hidden') && ($('#module-dropdown2').dropdown('get value') == ""))){
@@ -388,6 +429,8 @@ $(document).ready(() => {
 		}
 		//Hide Upload Click
 		else{
+			$('.ui.upload.message').hide()
+			$('.ui.upload.message pre').empty()
 			$('.ui.upload.dropdown').hide()
 			$('.upload.input').val("")
 			$('#show-upload-btn').html("Show Upload Options");
