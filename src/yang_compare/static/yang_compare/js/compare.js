@@ -25,7 +25,6 @@ var moduleCompare = function(){
 	if ($('#module-dropdown2').is(':hidden')){
 		url += $('#module-dropdown1').dropdown('get value') + '/' + 
 				$('#difftype').dropdown('get value');
-		console.log("test")
 		checkFileExistsAndDiff($('#version-dropdown2').dropdown('get value'), $('#module-dropdown1').dropdown('get value'), url)
 	}
 	else{
@@ -157,6 +156,7 @@ function handleModal(id){
 }
 
 var inputChanged = false;
+var fileInputAdded = false;
 
 $(document).ready(() => {
 	
@@ -309,8 +309,10 @@ $(document).ready(() => {
   	});
 
   	$('.upload.input').on('change', () => {
+  		fileInputAdded = true
   		$('#version-dropdown1').dropdown('clear')
 		$('#version-dropdown2').dropdown('clear')
+		fileInputAdded = false
   	})
 
 	$('#compare-btn').on('click', () => {
@@ -347,12 +349,14 @@ $(document).ready(() => {
 		inputChanged = true;
 		$('.ui.diff.message').hide()
 		$('#no-module-msg pre').empty()
-		if (($('#version-dropdown1').dropdown('get value') != "") ||
-				($('#version-dropdown2').dropdown('get value') != "") ||
-				($('#module-dropdown1').dropdown('get value') != "") || 
-				($('#module-dropdown2').dropdown('get value') != "")){
-			if ($('#show-upload-btn').html() == "Hide Upload Options"){
-				$('#show-upload-btn').click()
+		if (!fileInputAdded){
+			if (($('#version-dropdown1').dropdown('get value') != "") ||
+					($('#version-dropdown2').dropdown('get value') != "") ||
+					($('#module-dropdown1').dropdown('get value') != "") || 
+					($('#module-dropdown2').dropdown('get value') != "")) {
+				if ($('#show-upload-btn').html() == "Hide Upload Options"){
+					$('#show-upload-btn').click()
+				}
 			}
 		}
 	})
@@ -364,8 +368,6 @@ $(document).ready(() => {
 	$('#clear-btn').on('click', () => {
 		$('#version-dropdown1').dropdown('clear')
 		$('#version-dropdown2').dropdown('clear')
-		// $('#module-dropdown1').dropdown('clear')
-		// $('#module-dropdown2').dropdown('clear')
 	})
 
 	$('#different-module-btn').on('click', () => {
@@ -380,9 +382,11 @@ $(document).ready(() => {
 	})
 
 	$('#show-upload-btn').on('click', () => {
+		//Show Upload Click
 		if ($('#show-upload-btn').html() == "Show Upload Options"){
 			$('#show-upload-btn').html("Hide Upload Options")
 		}
+		//Hide Upload Click
 		else{
 			$('.ui.upload.dropdown').hide()
 			$('.upload.input').val("")
