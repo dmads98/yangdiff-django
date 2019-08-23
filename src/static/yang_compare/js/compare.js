@@ -80,7 +80,8 @@ $('#upload-form').submit(function () {
 	    			$('#post-diff-warning').css('display', 'inline-block');
     			}		
     			$('#diff pre').append(response.diff)
-    			$('#diff').css('display', 'inline-block');
+    			// $('#diff').css('display', 'inline-block');
+    			$('#diff').show()
     		}
     		$('#compare-btn').removeClass('loading')
 		},
@@ -114,7 +115,8 @@ function findDiff(url){
 	    			$('#post-diff-warning').css('display', 'inline-block');
     			}		
     			$('#diff pre').append(response.diff)
-    			$('#diff').css('display', 'inline-block');
+    			// $('#diff').css('display', 'inline-block');
+    			$('#diff').show()
     		}
     		$('#compare-btn').removeClass('loading')
     	},
@@ -395,6 +397,7 @@ $(document).ready(() => {
 
   	$('.upload.input').on('change', () => {
   		inputChanged = true
+  		$('.ui.diff.message').hide()
   		fileInputAdded = true
   		$('#version-dropdown1').dropdown('clear')
 		$('#version-dropdown2').dropdown('clear')
@@ -409,6 +412,7 @@ $(document).ready(() => {
 
   	$('.upload.dropdown').on('change', () => {
   		inputChanged = true
+  		$('.ui.diff.message').hide()
 		$('#upload-module-msg').hide()
 		$('#upload-module-msg pre').empty()
   	})

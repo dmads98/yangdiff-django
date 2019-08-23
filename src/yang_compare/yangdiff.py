@@ -165,12 +165,16 @@ def checkForValidFiles(file, dir_name):
 
 def handleUploadedFiles(files, oldPrimary, newPrimary, difftype):
 	result = prepareInfo(files, True, oldPrimary)
+	warnings = []
 	if result["errors"]:
-		return {"output": "", "errors": result["errors"], "warnings": []}
+		return {"output": "", "errors": result["errors"], "warnings": warnings}
+	if result['warnings']:
+		warnings += result['warnings']
 	result = prepareInfo(files, False, newPrimary)
 	if result["errors"]:
-		return {"output": "", "errors": result["errors"], "warnings": []}
-	warnings = []
+		return {"output": "", "errors": result["errors"], "warnings": warnings}
+	if result['warnings']:
+		warnings += result['warnings']
 	result = checkForValidFiles(oldPrimary[:-5] + "-000", "yang_old")
 	if result['errors']:
 		return {"output": "", "errors": result["errors"], "warnings": result['warnings']}
@@ -221,22 +225,22 @@ def prepareInfo(files, isOld, primaryFile):
 		modules = files.getlist('old_modules')
 	else:
 		modules = files.getlist('new_modules')
-	file_names = []
+	file_dict = {}
 	for file in modules:
-		file_names.append(file.name)
-	index = file_names.index(primaryFile)
-	modules.insert(0, modules.pop(index))
-	names = set()
-	names.update(file_names)
+		file_dict[file.name] = file
 	if isOld:
-		return modifyUploadedFiles("000", modules, names, True)
+		return modifyUploadedFiles("000", file_dict, primaryFile, True)
 	else:
-		return modifyUploadedFiles("111", modules, names, False)
+		return modifyUploadedFiles("111", file_dict, primaryFile, False)
 
-def modifyUploadedFiles(vers, files, file_names, isOld):
+def modifyUploadedFiles(vers, file_map, primary, isOld):
+	file_list = [file_map[primary]]
 	primaryFileChecked = False
-	while files:
-		cur = files.pop(0)
+	completed = set()
+	while file_list:
+		cur = file_list.pop()
+		if cur.name in completed:
+			continue
 		if isOld:
 			f = open("yang_old/" + cur.name[:-5] + "-" + vers + ".yang", "wb+")
 		else:
@@ -254,7 +258,7 @@ def modifyUploadedFiles(vers, files, file_names, isOld):
 					primaryFileChecked = True
 					if line.startswith("submodule"):
 						return {"errors":  ["Please select a primary module or types file to compare. You have selected a submodule." +
-							"\nA node tree cannot be constructed from this file."]}
+							"\nA node tree cannot be constructed from this file."], "warnings": []}
 				if isOld:
 					f.write(modifyLine(line, vers)[0].encode())
 				else:
@@ -265,21 +269,31 @@ def modifyUploadedFiles(vers, files, file_names, isOld):
 				if isOld:
 					result = modifyLine(line[tab:], vers)
 					# file_list.append(result[1])
-					fl = result[1]
-					if fl + ".yang" not in file_names:
-						return {"errors": ["File Not Found in Old Modules: " + fl + ".yang"]}
+					fl = result[1] + ".yang"
+					if fl not in file_map.keys():
+						return {"errors": ["File Not Found in Old Modules: " + fl]}
+					else:
+						file_list.append(file_map[fl])
 					f.write((line[:tab] + result[0]).encode())
 				else:
-					fl = line[tab:].split()[1]
-					if fl + ".yang" not in file_names:
-						return {"errors": ["File Not Found in New Modules: " + fl + ".yang"]}
+					fl = line[tab:].split()[1] + ".yang"
+					if fl not in file_map.keys():
+						return {"errors": ["File Not Found in New Modules: " + fl]}
+					else:
+						file_list.append(file_map[fl])
 					f.write(line.encode())
 				continue
 			if line.find("organization") >= 0:
 				header_parsed = True
 			f.write(line.encode())
 		f.close()
-	return {"errors": []}
+		completed.add(cur.name)
+	if (len(completed) == len(file_map)):
+		return {"errors": [], "warnings": []}
+	if isOld:
+		return {"errors": [], "warnings": ["You have uploaded some unnecessary old modules for the comparison."]}
+	else:
+		return {"errors": [], "warnings": ["You have uploaded some unnecessary new modules for the comparison."]}
 
 
 def main():

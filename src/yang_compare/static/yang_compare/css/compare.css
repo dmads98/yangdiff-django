@@ -37,6 +37,10 @@
   display: none;
 }
 
+#diff{
+  display: none;
+}
+
 #jumbo{
   background-color: #9ed1de;
 }
