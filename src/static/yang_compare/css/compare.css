@@ -18,6 +18,7 @@
 #upload-section input{
   width: 1px;
   height: 1px;
+  visibility: hidden;
 }
 
 #module-dropdown2{

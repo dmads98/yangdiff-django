@@ -71,7 +71,7 @@ def emptyYangDirectories():
 	subprocess.call("rm -r yang_old/*", shell=True)
 	subprocess.call("rm -r yang_new/*", shell=True)
 
-def getAndOrModifyFiles(vers, file, old):
+def getAndOrModifyFiles(vers, file, isOld):
 	file_list = [file[:-5]]
 	completed = set()
 	primaryFileChecked = False
@@ -79,7 +79,7 @@ def getAndOrModifyFiles(vers, file, old):
 		cur = file_list.pop()
 		if cur in completed:
 			continue
-		if old:
+		if isOld:
 			f = open("yang_old/" + cur + "-" + vers + ".yang", "w+")
 		else:
 			f = open("yang_new/" + cur + ".yang", "w+")
@@ -100,14 +100,14 @@ def getAndOrModifyFiles(vers, file, old):
 				continue
 			if not filename_parsed:
 				filename_parsed = True
-				if old:
+				if isOld:
 					f.write(modifyLine(line, vers)[0])
 				else:
 					f.write(line)
 				continue
 			if line.find("import") != -1 or line.find("include") != -1 or line.find("belongs-to") != -1:
 				tab = len(line) - len(line.lstrip())
-				if old:
+				if isOld:
 					result = modifyLine(line[tab:], vers)
 					file_list.append(result[1])
 					f.write(line[:tab] + result[0])
@@ -137,9 +137,7 @@ def checkForValidFiles(file, dir_name):
 		dir_name + "/" + file + ".yang",  
 		"-p",
 		dir_name], capture_output=True, text=True)
-	print(subpr.stdout)
 	if subpr.stderr != "":
-		print(subpr.stderr)
 		index = subpr.stderr.find("]")
 		if index != -1:
 			# this error should not occur. would be caught by getAndOrModifyFiles()
@@ -158,6 +156,128 @@ def checkForValidFiles(file, dir_name):
 				warnings.append(line)
 		return {"errors": errors, "warnings": warnings}
 	return {"errors": [], "warnings": []}
+
+# ========================================================================================================================================
+# Uploaded Files Handling
+
+def handleUploadedFiles(files, oldPrimary, newPrimary, difftype):
+	result = prepareInfo(files, True, oldPrimary)
+	if result["errors"]:
+		return {"output": "", "errors": result["errors"], "warnings": []}
+	result = prepareInfo(files, False, newPrimary)
+	if result["errors"]:
+		return {"output": "", "errors": result["errors"], "warnings": []}
+	warnings = []
+	result = checkForValidFiles(oldPrimary[:-5] + "-000", "yang_old")
+	if result['errors']:
+		return {"output": "", "errors": result["errors"], "warnings": result['warnings']}
+	if result['warnings']:
+		warnings += result['warnings']
+	result = checkForValidFiles(newPrimary[:-5], "yang_new")
+	if result['errors']:
+		return {"output": "", "errors": result["errors"], "warnings": result['warnings']}
+	if result['warnings']:
+		warnings += result['warnings']
+	subpr = subprocess.run([
+		"yangdiff-pro",
+		"--old=yang_old/" + oldPrimary[:-5] + "-000" + ".yang",
+		"--new=yang_new/" + newPrimary,
+		"--modpath=" + "yang_old:yang_new",
+		"--difftype=" + difftype,
+		"--header=false"], capture_output=True, text=True)
+	output = subpr.stdout.strip('\n')
+	errors = []
+	if output.startswith("Error"):
+		errors.append("Comparison Unsuccessful")
+	return {"output": cleanUploadOutput(output), "errors": errors, "warnings": warnings}
+
+def cleanUploadOutput(output):
+	result = []
+	i = 0
+	lines = output.splitlines()
+	header_parsed = False
+	while i < len(lines):
+		line = lines[i]
+		if not header_parsed:
+			if line.startswith("Warning: Module") and line.endswith("not used"):
+				# this warning will be taken care of through pyang
+				i += 3
+				continue
+			if line.startswith("// old:"):
+				oldHeader = line.split()
+				oldHeader[2] = oldHeader[2][:-4]
+				oldHeader[4] = oldHeader[4][:-9] + ".yang"
+				line = ' '.join(oldHeader)
+				header_parsed = True
+		result.append(line)
+		i += 1
+	return '\n'.join(result)
+
+def prepareInfo(files, isOld, primaryFile):
+	if isOld:
+		modules = files.getlist('old_modules')
+	else:
+		modules = files.getlist('new_modules')
+	file_names = []
+	for file in modules:
+		file_names.append(file.name)
+	index = file_names.index(primaryFile)
+	modules.insert(0, modules.pop(index))
+	names = set()
+	names.update(file_names)
+	if isOld:
+		return modifyUploadedFiles("000", modules, names, True)
+	else:
+		return modifyUploadedFiles("111", modules, names, False)
+
+def modifyUploadedFiles(vers, files, file_names, isOld):
+	primaryFileChecked = False
+	while files:
+		cur = files.pop(0)
+		if isOld:
+			f = open("yang_old/" + cur.name[:-5] + "-" + vers + ".yang", "wb+")
+		else:
+			f = open("yang_new/" + cur.name[:-5] + ".yang", "wb+")
+		header_parsed = False
+		filename_parsed = False
+		for line in cur:
+			line = line.decode("utf-8")
+			if header_parsed or line.find("/***") != -1:
+				f.write(line.encode())
+				continue
+			if not filename_parsed:
+				filename_parsed = True
+				if not primaryFileChecked:
+					primaryFileChecked = True
+					if line.startswith("submodule"):
+						return {"errors":  ["Please select a primary module or types file to compare. You have selected a submodule." +
+							"\nA node tree cannot be constructed from this file."]}
+				if isOld:
+					f.write(modifyLine(line, vers)[0].encode())
+				else:
+					f.write(line.encode())
+				continue
+			if line.find("import") != -1 or line.find("include") != -1 or line.find("belongs-to") != -1:
+				tab = len(line) - len(line.lstrip())
+				if isOld:
+					result = modifyLine(line[tab:], vers)
+					# file_list.append(result[1])
+					fl = result[1]
+					if fl + ".yang" not in file_names:
+						return {"errors": ["File Not Found in Old Modules: " + fl + ".yang"]}
+					f.write((line[:tab] + result[0]).encode())
+				else:
+					fl = line[tab:].split()[1]
+					if fl + ".yang" not in file_names:
+						return {"errors": ["File Not Found in New Modules: " + fl + ".yang"]}
+					f.write(line.encode())
+				continue
+			if line.find("organization") >= 0:
+				header_parsed = True
+			f.write(line.encode())
+		f.close()
+	return {"errors": []}
+
 
 def main():
 	# emptyYangDirectories()

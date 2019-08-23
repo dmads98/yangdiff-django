@@ -15,24 +15,82 @@
 //     });
 // };
 
-var moduleCompare = function(){
+var moduleCompare = function(upload){
 	$('#compare-btn').addClass('loading')
 	$('#diff pre').empty()
-	let url = 'ajax/findDiff/' + 
-		$('#version-dropdown1').dropdown('get value') + '/' +
-		$('#module-dropdown1').dropdown('get value') + '/' +
-		$('#version-dropdown2').dropdown('get value') + '/'
-	if ($('#module-dropdown2').is(':hidden')){
-		url += $('#module-dropdown1').dropdown('get value') + '/' + 
+	if (!upload){
+		let url = 'ajax/findDiff/' + 
+			$('#version-dropdown1').dropdown('get value') + '/' +
+			$('#module-dropdown1').dropdown('get value') + '/' +
+			$('#version-dropdown2').dropdown('get value') + '/'
+		if ($('#module-dropdown2').is(':hidden')){
+			url += $('#module-dropdown1').dropdown('get value') + '/' + 
+					$('#difftype').dropdown('get value');
+			checkFileExistsAndDiff($('#version-dropdown2').dropdown('get value'), $('#module-dropdown1').dropdown('get value'), url)
+		}
+		else{
+			url += $('#module-dropdown2').dropdown('get value') + '/' + 
 				$('#difftype').dropdown('get value');
-		checkFileExistsAndDiff($('#version-dropdown2').dropdown('get value'), $('#module-dropdown1').dropdown('get value'), url)
+			findDiff(url)
+		}
 	}
 	else{
-		url += $('#module-dropdown2').dropdown('get value') + '/' + 
-			$('#difftype').dropdown('get value');
-		findDiff(url)
+		$('#upload-form').submit()
 	}
 };
+
+$('#upload-form').submit(function () {
+	var data = new FormData();
+
+  	$.each($("#file-input1")[0].files, function(i, file) {
+    	data.append("old_modules", file);
+  	});
+  	data.append("csrfmiddlewaretoken", $("#file-input1").attr("data-csrf-token"));
+
+  	$.each($("#file-input2")[0].files, function(i, file) {
+    	data.append("new_modules", file);
+  	});
+  	data.append("csrfmiddlewaretoken", $("#file-input2").attr("data-csrf-token"));
+
+  	let url = 'ajax/fileUpload/' + $('#file-upload-select1').dropdown('get value') + '/' + 
+  		$('#file-upload-select2').dropdown('get value') + '/' + $('#difftype').dropdown('get value');
+
+	$.ajax({
+		url: url,
+		type: 'POST',
+		data: data,
+		cache: false,
+		contentType: false,
+		processData: false,
+		success: function(response) {
+			console.log(response)
+    		if (response.errors.length != 0){
+    			$('#error-msg pre').empty()
+    			response.errors.forEach(function(element) {
+    				$('#error-msg pre').append(element + "\n")
+				});
+    			$('#error-msg').css('display', 'inline-block');
+    		}
+    		else{
+    			if (response.warnings.length != 0){
+	    			$('#post-diff-warning pre').empty()
+	    			response.warnings.forEach(function(element) {
+	    				$('#post-diff-warning pre').append(element + "\n")
+					});
+	    			$('#post-diff-warning').css('display', 'inline-block');
+    			}		
+    			$('#diff pre').append(response.diff)
+    			$('#diff').css('display', 'inline-block');
+    		}
+    		$('#compare-btn').removeClass('loading')
+		},
+		error: function(response){
+			console.log(response)
+			alert("error in ajax form submission");
+		}
+	});
+  return false;
+});
 
 function findDiff(url){
 	$.ajax({
@@ -157,6 +215,7 @@ function handleModal(id){
 
 var inputChanged = false;
 var fileInputAdded = false;
+var fileNumError = false;
 
 $(document).ready(() => {
 	
@@ -286,11 +345,18 @@ $(document).ready(() => {
 			$('#file-upload-select1').hide()
 			$('#file-upload-select1 .menu').empty()
 		}
+		else if (input.files.length > 15){
+			$('#file-upload-select2').hide()
+			$('#file-upload-select2 .menu').empty()
+			fileNumError = true
+		}
 		else{
 			$('#file-upload-select1').dropdown('clear')
 	 		$('#file-upload-select1 .menu').empty()
 		  	for (var i = 0; i < input.files.length; i++) {
-		  		let element = `<div class="item">` + input.files[i].name + `</div>`
+		  		let moduleName = input.files[i].name.substring(0, input.files[i].name.length - 5)
+		  		let element = `<div class="item" data-value="` + input.files[i].name + `" data-text="` + 
+		  			moduleName + `">` + moduleName + `</div>`
 		    	$('#file-upload-select1 .menu').append(element);
 		    }
 		    $('#file-upload-select1').css('display', 'inline-block');
@@ -308,11 +374,18 @@ $(document).ready(() => {
 			$('#file-upload-select2').hide()
 			$('#file-upload-select2 .menu').empty()
 		}
+		else if (input.files.length > 15){
+			$('#file-upload-select2').hide()
+			$('#file-upload-select2 .menu').empty()
+			fileNumError = true
+		}
 		else{
 			$('#file-upload-select2').dropdown('clear')
 	 		$('#file-upload-select2 .menu').empty()
 		  	for (var i = 0; i < input.files.length; i++) {
-		  		let element = `<div class="item">` + input.files[i].name + `</div>`
+		  		let moduleName = input.files[i].name.substring(0, input.files[i].name.length - 5)
+		  		let element = `<div class="item" data-value="` + input.files[i].name + `" data-text="` + 
+		  			moduleName + `">` + moduleName + `</div>`
 		    	$('#file-upload-select2 .menu').append(element);
 		    }
 		    $('#file-upload-select2').css('display', 'inline-block');
@@ -321,15 +394,21 @@ $(document).ready(() => {
   	});
 
   	$('.upload.input').on('change', () => {
+  		inputChanged = true
   		fileInputAdded = true
   		$('#version-dropdown1').dropdown('clear')
 		$('#version-dropdown2').dropdown('clear')
 		fileInputAdded = false
 		$('.ui.upload.message').hide()
-		$('.ui.upload.message pre').empty()
+		$('.ui.upload.custom.message pre').empty()
+		if (fileNumError){
+			fileNumError = false
+			$('#upload-num-msg').css('display', 'inline-block');
+		}
   	})
 
   	$('.upload.dropdown').on('change', () => {
+  		inputChanged = true
 		$('#upload-module-msg').hide()
 		$('#upload-module-msg pre').empty()
   	})
@@ -356,24 +435,32 @@ $(document).ready(() => {
 				$('#upload-module-msg pre').append("A primary module for the set of New Modules has not been selected.")
 				$('#upload-module-msg').css('display', 'inline-block');
 			}
+			else if (inputChanged) {
+				inputChanged = false;
+				$('#diff').hide()
+				moduleCompare(upload)
+			}
 		}
-		else if (($('#version-dropdown1').dropdown('get value') == "") ||
-				($('#version-dropdown2').dropdown('get value') == "") ||
-				($('#module-dropdown1').dropdown('get value') == "") || 
-				(!$('#module-dropdown2').is(':hidden') && ($('#module-dropdown2').dropdown('get value') == ""))){
-			$('#module-missing-msg').css('display', 'inline-block');
-		}
-		else if (($('#version-dropdown1').dropdown('get value') == $('#version-dropdown2').dropdown('get value')) &&
-				($('#module-dropdown2').is(':hidden') || ($('#module-dropdown1').dropdown('get value') == $('#module-dropdown2').dropdown('get value')))) {
-			$('#same-module-msg').css('display', 'inline-block');
-		}
-		else if ($('#no-module-msg pre').html() != ""){
-			$('#no-module-msg').css('display', 'inline-block');
-		}
-		else if (inputChanged) {
-			inputChanged = false;
-			$('#diff').hide()
-			moduleCompare()
+		else {
+			$('.ui.upload.message').hide()
+			if (($('#version-dropdown1').dropdown('get value') == "") ||
+					($('#version-dropdown2').dropdown('get value') == "") ||
+					($('#module-dropdown1').dropdown('get value') == "") || 
+					(!$('#module-dropdown2').is(':hidden') && ($('#module-dropdown2').dropdown('get value') == ""))){
+				$('#module-missing-msg').css('display', 'inline-block');
+			}
+			else if (($('#version-dropdown1').dropdown('get value') == $('#version-dropdown2').dropdown('get value')) &&
+					($('#module-dropdown2').is(':hidden') || ($('#module-dropdown1').dropdown('get value') == $('#module-dropdown2').dropdown('get value')))) {
+				$('#same-module-msg').css('display', 'inline-block');
+			}
+			else if ($('#no-module-msg pre').html() != ""){
+				$('#no-module-msg').css('display', 'inline-block');
+			}
+			else if (inputChanged) {
+				inputChanged = false;
+				$('#diff').hide()
+				moduleCompare(upload)
+			}
 		}
 	})
 
@@ -407,8 +494,11 @@ $(document).ready(() => {
 	})
 
 	$('#clear-btn').on('click', () => {
-		$('#version-dropdown1').dropdown('clear')
-		$('#version-dropdown2').dropdown('clear')
+		$('.ui.dropdown').dropdown('clear')
+		if ($('#show-upload-btn').html() == "Hide Upload Options"){
+			$('#show-upload-btn').click()
+		}
+		$('#difftype').dropdown('restore default value');
 	})
 
 	$('#different-module-btn').on('click', () => {

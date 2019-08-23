@@ -4,7 +4,7 @@ import requests
 import json
 from django.conf import settings
 import subprocess
-from .yangdiff import fileCompare, emptyYangDirectories
+from .yangdiff import fileCompare, emptyYangDirectories, handleUploadedFiles
 
 # Create your views here.
 
@@ -59,6 +59,13 @@ def getFileContent(request, vers, file):
 def compareFiles(request, oldvers, oldfile, newvers, newfile, difftype):
 	if request.method == "GET" and request.is_ajax():
 		result = fileCompare(oldvers, oldfile, newvers, newfile, difftype)
+		emptyYangDirectories()
+		return JsonResponse({"success": True, "diff": result["output"], "errors": result["errors"], "warnings": result["warnings"]}, status=200)
+	return JsonResponse({"success": False}, status=400)
+
+def fileUpload(request, oldPrimary, newPrimary, difftype):
+	if request.method == "POST":
+		result = handleUploadedFiles(request.FILES, oldPrimary, newPrimary, difftype)
 		emptyYangDirectories()
 		return JsonResponse({"success": True, "diff": result["output"], "errors": result["errors"], "warnings": result["warnings"]}, status=200)
 	return JsonResponse({"success": False}, status=400)

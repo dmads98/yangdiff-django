@@ -100,30 +100,34 @@ Yang Module Compare
   <div class="ui divider"></div>
 
   <div id="upload-section">
-    <button id="upload-button1" class="ui right labeled icon button">
-      <i class="upload icon"></i>
-      Upload Old Modules
-    </button>
-    <input id='file-input1' type='file' class="upload input" multiple/>
-    <div id="file-upload-select1" class="ui compact selection upload dropdown floating button">
-      <input type="hidden" name="file-upload">
-      <i class="dropdown icon"></i>
-      <div class="default text">Select Primary Module</div>
-      <div class="menu">
+    <form enctype="multipart/form-data" id="upload-form">
+    <!-- <form id="upload-form"> -->
+      <button id="upload-button1" type="button" class="ui right labeled icon button">
+        <i class="upload icon"></i>
+        Upload Old Modules
+      </button>
+      <input id='file-input1' type='file' class="upload input" data-csrf-token="{{ csrf_token }}" accept=".yang" multiple/>
+      <div id="file-upload-select1" class="ui compact selection upload dropdown floating button">
+        <input type="hidden" name="file-upload">
+        <i class="dropdown icon"></i>
+        <div class="default text">Select Primary Module</div>
+        <div class="menu">
+        </div>
       </div>
-    </div>
-    <button id="upload-button2" class="ui right labeled icon button">
-      <i class="upload icon"></i>
-      Upload New Modules
-    </button>
-    <input id='file-input2' type='file' class="upload input" multiple/>
-    <div id="file-upload-select2" class="ui compact selection upload dropdown floating button">
-      <input type="hidden" name="file-upload">
-      <i class="dropdown icon"></i>
-      <div class="default text">Select Primary Module</div>
-      <div class="menu">
+      <button id="upload-button2" type="button" class="ui right labeled icon button">
+        <i class="upload icon"></i>
+        Upload New Modules
+      </button>
+      <input id='file-input2' type='file' class="upload input" data-csrf-token="{{ csrf_token }}" accept=".yang" multiple/>
+      <div id="file-upload-select2" class="ui compact selection upload dropdown floating button">
+        <input type="hidden" name="file-upload">
+        <i class="dropdown icon"></i>
+        <div class="default text">Select Primary Module</div>
+        <div class="menu">
+        </div>
       </div>
-    </div>
+      <!-- <input id="upload-submit" type="submit" value="Submit"> -->
+    </form>
     <div class="ui divider"></div>
   </div>
 
@@ -172,7 +176,7 @@ Yang Module Compare
   <pre></pre>
 </div>
 
-<div id="upload-missing-msg" class="ui compact warning upload diff message">
+<div id="upload-missing-msg" class="ui compact warning upload custom diff message">
   <i class="close icon"></i>
   <div class="header">
     Please upload your YANG modules.
@@ -180,12 +184,20 @@ Yang Module Compare
   <pre></pre>
 </div>
 
-<div id="upload-module-msg" class="ui compact warning upload diff message">
+<div id="upload-module-msg" class="ui compact warning upload custom diff message">
   <i class="close icon"></i>
   <div class="header">
     Please select a primary module.
   </div>
   <pre></pre>
+</div>
+
+<div id="upload-num-msg" class="ui compact warning upload diff message">
+  <i class="close icon"></i>
+  <div class="header">
+    Please limit the number of uploaded files to 15.
+  </div>
+  <pre>You have exceeded the maximum number of files allowed to be uploaded.</pre>
 </div>
 
 <div id="error-msg" class="ui compact negative diff message">
