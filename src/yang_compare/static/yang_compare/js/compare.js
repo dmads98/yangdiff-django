@@ -1,20 +1,3 @@
-// var getVersions = function(){
-//     $.ajax({
-//     	url: 'ajax/test',
-//     	type: 'GET',
-//     	success: function(response){
-//     		let list = '';
-//         	response.versions.forEach(vers => {
-//         		list += `<div class="item">${vers}</div>`;
-// 			});
-//     		$('#versions-list').append(list);
-//     	},
-//     	error : function(response){
-// 			console.log(response)
-// 		}
-//     });
-// };
-
 var moduleCompare = function(upload){
 	$('#compare-btn').addClass('loading')
 	$('#diff pre').empty()
