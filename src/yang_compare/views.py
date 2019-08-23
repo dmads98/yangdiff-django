@@ -5,10 +5,15 @@ import json
 from django.conf import settings
 import subprocess
 from .yangdiff import fileCompare, emptyYangDirectories, handleUploadedFiles
+from .flatten import compileFilePaths
 
 # Create your views here.
 
+# using my own github personal access token to allow for up to 5000 authenticated requests per hour
+# needs to be changed, will change with addition of database
+# storing token in .bashrc
 MY_TOKEN = settings.MY_TOKEN
+
 
 def compare_page(request):
 	context = {"title": "Yang Compare"}
@@ -50,7 +55,7 @@ def getDropDownFiles(request, vers):
 def getFileContent(request, vers, file):
 	if request.method == "GET" and request.is_ajax():
 		url = "https://raw.githubusercontent.com/YangModels/yang/master/vendor/cisco/xr/" + vers + "/" + file
-		content_req = requests.get(url)
+		content_req = requests.get(url, auth=('dmads98', MY_TOKEN))
 		if content_req.text.startswith("404"):
 			return JsonResponse({"success": False, "version": vers, "file": file}, status=400)
 		return JsonResponse({"success": True, "content": content_req.text}, status=200)
@@ -72,10 +77,7 @@ def fileUpload(request, oldPrimary, newPrimary, difftype):
 
 def constructFilePaths(request):
 	if request.method == "POST" and request.is_ajax():
-		print(request.POST['content'])
-		return JsonResponse({"success": True}, status=200)
+		result = compileFilePaths(request.POST['content'])
+		return JsonResponse({"success": True, "header": result["header"], "changes": result["changes"], 
+			"additions": result["additions"], "deletions": result["deletions"]}, status=200)
 	return JsonResponse({"success": False}, status=400)
-
-
-
-

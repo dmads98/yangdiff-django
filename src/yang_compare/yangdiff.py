@@ -1,5 +1,8 @@
 import subprocess
 import requests
+from django.conf import settings
+
+MY_TOKEN = settings.MY_TOKEN
 
 def fileCompare(oldvers, oldfile, newvers, newfile, difftype):
 	result = getAndOrModifyFiles(oldvers, oldfile, True)
@@ -87,7 +90,7 @@ def getAndOrModifyFiles(vers, file, isOld):
 		else:
 			f = open("yang_new/" + cur + ".yang", "w+")
 		url = "https://raw.githubusercontent.com/YangModels/yang/master/vendor/cisco/xr/" + vers + "/" + cur + ".yang"
-		content = requests.get(url)
+		content = requests.get(url, auth=('dmads98', MY_TOKEN))
 		if (content.status_code == 404):
 			return {"errors": ["File Not Found: " + vers + "/" + cur + ".yang"]}
 		if not primaryFileChecked:

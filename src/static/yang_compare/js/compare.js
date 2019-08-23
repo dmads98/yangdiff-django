@@ -226,14 +226,21 @@ function handleModal(id){
 }
 
 function constructFilePaths(){
-	// let outputLines = $('#diff pre').html().split(/\r?\n/);
-	// console.log(outputLines)
 	$.ajax({
 		url: 'ajax/filePaths',
 		type: 'POST',
 		data: {content: $('#diff pre').html()},
 		success: function(response) {
 			console.log(response)
+			$('#flat-file-view pre').append(response.header[0] + '\n')
+			$('#flat-file-view pre').append(response.header[1] + '\n\n')
+			$('#flat-file-view pre').append("Changes:\n\n")
+			appendPaths(response.changes)
+			$('#flat-file-view pre').append("Additions:\n\n")
+			appendPaths(response.additions)
+			$('#flat-file-view pre').append("Deletions:\n\n")
+			appendPaths(response.deletions)
+			$('#flat-file-view').modal('show')
 		},
 		error: function(response){
 			console.log(response)
@@ -241,10 +248,23 @@ function constructFilePaths(){
 	});
 }
 
+function appendPaths(paths){
+	const array = paths
+	array.forEach(function (path, index) {
+  		$('#flat-file-view pre').append(path + '\n')
+	});
+	if (array.length > 0){
+		$('#flat-file-view pre').append('\n')
+	}
+}
+
 
 var inputChanged = false;
 var fileInputAdded = false;
 var fileNumError = false;
+
+// ================================================================================================================================
+// deals with csrf tokens for any ajax post requests
 
 function getCookie(name) {
     var cookieValue = null;
@@ -274,6 +294,8 @@ $.ajaxSetup({
         }
     }
 });
+
+// ================================================================================================================================
 
 $(document).ready(() => {
 	
