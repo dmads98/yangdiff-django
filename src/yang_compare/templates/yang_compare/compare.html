@@ -227,10 +227,33 @@ Yang Module Compare
     <pre></pre>
   </div>
   <div class="ui bottom attached right aligned segment">
+    <button id="flat-file-btn" class="ui primary animated button" tabindex="0">
+      <div class="visible content">View Diff Paths</div>
+      <div class="hidden content">
+        <i class="right arrow icon"></i>
+      </div>
+    </button>
     <button id="download-btn" class="ui primary right labeled icon button">
       <i class="download icon"></i>
       Download
     </button>
+  </div>
+</div>
+
+<div id="flat-file-view" class="ui modal">
+  <div class="header">Diff Paths</div>
+  <div class="scrolling content">
+    <pre></pre>
+  </div>
+  <div class="actions">
+    <button id="flat-file-download-btn" class="ui primary right labeled icon button">
+      <i class="download icon"></i>
+      Download
+    </button>
+    <div class="ui primary approve right labeled icon button">
+      Continue
+      <i class="checkmark icon"></i>
+    </div>
   </div>
 </div>
 

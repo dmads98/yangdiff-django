@@ -18,6 +18,7 @@
 var moduleCompare = function(upload){
 	$('#compare-btn').addClass('loading')
 	$('#diff pre').empty()
+	$('#flat-file-view pre').empty()
 	if (!upload){
 		let url = 'ajax/findDiff/' + 
 			$('#version-dropdown1').dropdown('get value') + '/' +
@@ -82,12 +83,17 @@ $('#upload-form').submit(function () {
     			$('#diff pre').append(response.diff)
     			// $('#diff').css('display', 'inline-block');
     			$('#diff').show()
+    			if (response.diff == "No Difference Found!" || $('#difftype').dropdown('get value') == "terse"){
+    				$('#flat-file-btn').hide()
+    			}
+    			else{
+    				$('#flat-file-btn').show()
+    			}
     		}
     		$('#compare-btn').removeClass('loading')
 		},
 		error: function(response){
 			console.log(response)
-			alert("error in ajax form submission");
 		}
 	});
   return false;
@@ -117,6 +123,12 @@ function findDiff(url){
     			$('#diff pre').append(response.diff)
     			// $('#diff').css('display', 'inline-block');
     			$('#diff').show()
+    			if (response.diff == "No Difference Found!" || $('#difftype').dropdown('get value') == "terse"){
+    				$('#flat-file-btn').hide()
+    			}
+    			else{
+    				$('#flat-file-btn').show()
+    			}
     		}
     		$('#compare-btn').removeClass('loading')
     	},
@@ -214,6 +226,11 @@ function handleModal(id){
 		$('#module-view' + id).modal('show')
 	}
 }
+
+function constructFilePaths(){
+	console.log("test")
+}
+
 
 var inputChanged = false;
 var fileInputAdded = false;
@@ -477,6 +494,15 @@ $(document).ready(() => {
 		contentDownload(content, filename)
 	})
 
+	$('#flat-file-btn').on('click', () => {
+		if ($('#flat-file-view pre').html() == ""){
+			constructFilePaths()
+		}
+		else{
+			$('#flat-file-view').modal('show')
+		}
+	})
+
 	$('.ui.main.dropdown').on('change', () => {
 		inputChanged = true;
 		$('.ui.diff.message').hide()
@@ -551,6 +577,12 @@ $(document).ready(() => {
 		let content = $('#module-view2 pre').html();
 		let filename = $('#version-dropdown2').dropdown('get text') + "_" + 
 			$('#module-dropdown2').dropdown('get text') + ".yang"
+		contentDownload(content, filename)
+	})
+
+	$('#flat-file-download-btn').on('click', () => {
+		let content = $('#flat-file-view pre').html();
+		let filename = "diffpaths.txt"
 		contentDownload(content, filename)
 	})
 	
