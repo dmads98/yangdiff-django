@@ -160,6 +160,9 @@ def checkForValidFiles(file, dir_name):
 # ========================================================================================================================================
 # Uploaded Files Handling
 
+# decent amount of repeated code structurally, could look into refactoring this code up to you to make it 
+# cleaner and more readable
+
 def handleUploadedFiles(files, oldPrimary, newPrimary, difftype):
 	result = prepareInfo(files, True, oldPrimary)
 	if result["errors"]:
