@@ -258,7 +258,6 @@ function appendPaths(paths){
 	}
 }
 
-
 var inputChanged = false;
 var fileInputAdded = false;
 var fileNumError = false;
