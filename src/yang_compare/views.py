@@ -64,11 +64,18 @@ def compareFiles(request, oldvers, oldfile, newvers, newfile, difftype):
 	return JsonResponse({"success": False}, status=400)
 
 def fileUpload(request, oldPrimary, newPrimary, difftype):
-	if request.method == "POST":
+	if request.method == "POST" and request.is_ajax():
 		result = handleUploadedFiles(request.FILES, oldPrimary, newPrimary, difftype)
 		emptyYangDirectories()
 		return JsonResponse({"success": True, "diff": result["output"], "errors": result["errors"], "warnings": result["warnings"]}, status=200)
 	return JsonResponse({"success": False}, status=400)
+
+def constructFilePaths(request):
+	if request.method == "POST" and request.is_ajax():
+		print(request.POST['content'])
+		return JsonResponse({"success": True}, status=200)
+	return JsonResponse({"success": False}, status=400)
+
 
 
 
