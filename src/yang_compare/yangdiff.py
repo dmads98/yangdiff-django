@@ -36,6 +36,9 @@ def cleanOutput(output, oldvers, newvers):
 	result = []
 	i = 0
 	lines = output.splitlines()
+	# no diff was found
+	if len(lines) == 2 or (len(lines) == 7 and lines[3].lstrip().startswith("revision")):
+		return "No Difference Found!"
 	header_parsed = False
 	while i < len(lines):
 		line = lines[i]
@@ -202,6 +205,9 @@ def cleanUploadOutput(output):
 	result = []
 	i = 0
 	lines = output.splitlines()
+	# no diff was found
+	if len(lines) == 2 or (len(lines) == 7 and lines[3].lstrip().startswith("revision")):
+		return "No Difference Found!"
 	header_parsed = False
 	while i < len(lines):
 		line = lines[i]
